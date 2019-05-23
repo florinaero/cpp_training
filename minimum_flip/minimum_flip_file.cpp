@@ -10,7 +10,7 @@ cout << "Hi, " << name << ".\n";        // Writing output to STDOUT
 // This version read file as input 
 
 // Write your code here
-#define DEBUG 0
+#define DEBUG 1
 #include <iostream>
 #include <vector>
 #include <string>
@@ -51,7 +51,7 @@ int main(int argc, char** argv){
     int noOfElements = 0 ;
     int noOfFlips = 0;
 
-    // const string PATH = argv[1];
+    const string PATH = argv[1];
     
 #if DEBUG
     cout << PATH << endl;
@@ -63,8 +63,8 @@ int main(int argc, char** argv){
 	vPair vSortedIndex [max+1];
 
     // Read file and store content in vector 
-    // readFile(PATH, input, noOfElements, noOfFlips);
-	readKeyboard(input, noOfElements, noOfFlips);
+    readFile(PATH, input, noOfElements, noOfFlips);
+	// readKeyboard(input, noOfElements, noOfFlips);
 #if DEBUG
     cout << "Number of elements: " << noOfElements << endl;
     cout << "Number of flips: " << noOfFlips << endl;
@@ -127,7 +127,7 @@ long minSum(vector<int>* vLast, int max){
 				sumBits = sumBits + (*it);
 			}
 		}
-		#if DEBUG
+		#if !DEBUG
 			cout << "number of bits for " << i << " = " << sumBits << endl;
 		#endif
 
@@ -173,7 +173,7 @@ void removeFlippArrays(vector<int>* vSortedIndex, int noOfFlips, int max){
 	sortVectorKeepIndex(vMax, index, max);
 
 
-#if DEBUG
+#if !DEBUG
 	static int n = 0;		
 	cout <<"\n vMax removedFlippArrays[" << n++ <<"]: ";
 	for(vPair::iterator it=(index).begin();it!=(index).end();++it){
