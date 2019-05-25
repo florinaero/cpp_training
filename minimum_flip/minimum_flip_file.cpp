@@ -11,6 +11,7 @@ cout << "Hi, " << name << ".\n";        // Writing output to STDOUT
 
 // Write your code here
 #define DEBUG 1
+#define DEBUG_HARD 0
 #include <iostream>
 #include <vector>
 #include <string>
@@ -22,7 +23,7 @@ using namespace std;
 typedef vector< pair<int,int> > vPair;
 
 // Remove element from vector that keeps largest subarray, auxiliary function
-void removeMaxElement(vector<int>* vSortedIndex, vPair& index);
+long removeMaxElement(vector<int>* vSortedIndex, vPair& index);
 // Sort vector and keep index
 void sortVectorKeepIndex(vector<int>& input, vPair& index, int max);
 // Sort vector with index 
@@ -66,34 +67,45 @@ int main(int argc, char** argv){
     readFile(PATH, input, noOfElements, noOfFlips);
 	// readKeyboard(input, noOfElements, noOfFlips);
 #if DEBUG
+    cout << "\n Next log is on line: " << __LINE__ << endl; 
     cout << "Number of elements: " << noOfElements << endl;
     cout << "Number of flips: " << noOfFlips << endl;
+    int sum = 0;
+    for( vector<int>::iterator it=(input).begin();it!=(input).end();++it){
+			sum = sum + (*it);
+	}
+	cout << "TOTAL SUM after reading = " << sum << endl;
 #endif
     // Read all elements
     // input: position of MSB
     allocation(max, input, vCounter);
+
+#if DEBUG
+    cout << "TOTAL SUM = " << minSum(vCounter, max) << endl; 
+#endif
 
     // Sort vector with index
     sortVector(vCounter, max);
 
 
 #if DEBUG
+    cout << "\n Next log is on line: " << __LINE__ << endl; 
     cout << "\nSize of subarrays and their position in vector in a sorted way. \n";
     for(int i=0;i<=max;i++){
 	 	cout <<"vCounter sorted[" << i <<"]: ";
 		for( vector<int>::iterator it=(vCounter[i]).begin();it!=(vCounter[i]).end();++it){
-			cout << *it << ",";
+			cout << *it << ", ";
 		}
 		cout << endl;
 	}
-	cout << "Number of Flips: " << noOfFlips << endl;
-	cout << "TOATAL SUM = " << minSum(vCounter, max) << endl; 
+	cout << "TOTAL SUM = " << minSum(vCounter, max) << endl; 
 #endif
 
 	removeFlippArrays(vCounter, noOfFlips, max);
 
 
 #if DEBUG
+	cout << "\n Next log is on line: " << __LINE__ << endl; 
     cout << "\nRemained elements. \n";
     for(int i=0;i<=max;i++){
 	 	cout <<"vCounter sorted[" << i <<"]: ";
@@ -127,9 +139,8 @@ long minSum(vector<int>* vLast, int max){
 				sumBits = sumBits + (*it);
 			}
 		}
-		#if !DEBUG
-			cout << "number of bits for " << i << " = " << sumBits << endl;
-		#endif
+
+				
 
 		if(i==0){
 			// Position 0 where value is 1 and shift not working
@@ -138,6 +149,7 @@ long minSum(vector<int>* vLast, int max){
 		else{
 			sum = sum + (pow(2,i) * sumBits);
 		}
+
 		// Reset sum of bits for each position in a number with "max" number of bits
 		sumBits = 0;
 	}
@@ -151,6 +163,7 @@ void removeFlippArrays(vector<int>* vSortedIndex, int noOfFlips, int max){
 	vPair index;
 	int pushedElement = 0;
 	int sumSize = 0;
+	int removedSum = 0;
 
 	// Clear vector before a new search
 	vMax.clear();
@@ -173,7 +186,7 @@ void removeFlippArrays(vector<int>* vSortedIndex, int noOfFlips, int max){
 	sortVectorKeepIndex(vMax, index, max);
 
 
-#if !DEBUG
+#if DEBUG_HARD
 	static int n = 0;		
 	cout <<"\n vMax removedFlippArrays[" << n++ <<"]: ";
 	for(vPair::iterator it=(index).begin();it!=(index).end();++it){
@@ -185,7 +198,7 @@ void removeFlippArrays(vector<int>* vSortedIndex, int noOfFlips, int max){
 #endif
 
 
-	removeMaxElement(vSortedIndex, index);
+	removedSum = removeMaxElement(vSortedIndex, index);
 	noOfFlips--;
 	// Check is nothing anymore to sort 			
 	if(sumSize !=0 && noOfFlips !=0){
@@ -193,11 +206,15 @@ void removeFlippArrays(vector<int>* vSortedIndex, int noOfFlips, int max){
 		// Recursivity 
 		removeFlippArrays(vSortedIndex, noOfFlips, max);
 	}
+	#if DEBUG 
+	cout << "Removed sum = " << removedSum << endl;
+	#endif
 }
 
 
-void removeMaxElement(vector<int>* vSortedIndex, vPair& index){
+long removeMaxElement(vector<int>* vSortedIndex, vPair& index){
 	int position = 0;
+	static int sum = 0;
 
 	if(!index.empty()){
 		position = index.back().second;
@@ -206,6 +223,9 @@ void removeMaxElement(vector<int>* vSortedIndex, vPair& index){
 
 	// Check for elements->Means bits for corresponding position are NOT anymore SET
 	if(!vSortedIndex[position].empty()){
+		#if DEBUG 
+		sum = sum + pow(2,position)*vSortedIndex[position].back();
+		#endif
 		// Remove from sorted vector the pair that has the biggest counter->largest subarray 
 		vSortedIndex[position].pop_back();
 		// Push next pair that has number of elements of subarray
@@ -224,6 +244,12 @@ void removeMaxElement(vector<int>* vSortedIndex, vPair& index){
 // 	}
 // 	cout << endl;
 // #endif
+	#if DEBUG
+	return sum;
+	#else  
+	return 1;
+	#endif 
+
 }
 // input: maximum decimal value of an element 
 void allocation(long max, vector<int>& input, vector<int>* vCounter){
@@ -235,14 +261,18 @@ void allocation(long max, vector<int>& input, vector<int>* vCounter){
     long actualPos = 0;
     long lastPos = 0;
     int n = 0;
+    int sum = 0;
 
     // Read elements until the last one
     for(vector<int>::iterator It = input.begin();It!=input.end();++It){
     	elem = *It;
 		// Store all elements
 		allElem.push_back(elem);
-		actualPos = allElem.size()-1;
 
+		actualPos = allElem.size()-1;
+		#if DEBUG 
+		cout << "\nelement = " << elem ;
+		#endif
 		// Cycle each bit of an element 
 	    for(int i=0;i<=max;i++){
 	    	// Check if bit is set, result is a number > 0
@@ -255,7 +285,7 @@ void allocation(long max, vector<int>& input, vector<int>* vCounter){
 		    		vCounter[i].push_back(1);
 		    	}
 
-				#if DEBUG
+				#if DEBUG_HARD
 					cout << "BIT: " << i <<" ELEM: " << elem << " Vcounter value: "<<
 					 vCounter[i].back() << " split size: " << split[i].size() <<
 					 " actual position: " << actualPos << endl;
@@ -267,7 +297,6 @@ void allocation(long max, vector<int>& input, vector<int>* vCounter){
 	    		if(split[i].size()>1){
 		    		// Last but one element stored in SET bit vector
 		    		lastPos = (split[i].end()[-2]);
-	   
 		    		// Check if last 2 stored numbers from a vector with set bits are consecutive
 		    		// In this way you know the subarrays with same set bits 
 		    		if(consecutive(actualPos, lastPos))
@@ -286,7 +315,8 @@ void allocation(long max, vector<int>& input, vector<int>* vCounter){
 
 
 #if DEBUG
-	cout << "Number of SET bits: " << n << endl;
+	cout << "\n__LINE__" << __LINE__ << endl;
+	cout << "\nNumber of SET bits: " << n << endl;
 	cout << "all elements: ";
 	for(vector<int>::iterator it=allElem.begin();it!=allElem.end();++it){
 			cout << (*it) << ", ";
@@ -301,6 +331,19 @@ void allocation(long max, vector<int>& input, vector<int>* vCounter){
 		cout << endl;
 	}
 
+	
+    vector<int> elements(20,0);
+    for(int i=0;i<=max;i++){
+    	for(vector<int>::iterator it=split[i].begin();it!=split[i].end();++it){
+    		elements.at(*it) = elements.at(*it) + pow(2,i);  
+    	}
+    }
+	
+	cout << "Reconstructed elements:" << endl;
+	for(vector<int>::iterator it=elements.begin();it!=elements.end();++it){
+		cout << *it << ",";	
+	}
+
 	for(int i=0;i<=max;i++){
 	 	cout <<"vCounter[" << i <<"]: ";
 		for(vector<int>::iterator it=vCounter[i].begin();it!=vCounter[i].end();++it){
@@ -310,9 +353,7 @@ void allocation(long max, vector<int>& input, vector<int>* vCounter){
 	}
 
 #endif
-
 }
-
 
 // Sort vector
 void sortVector(vector<int>* temp, int max){
@@ -337,11 +378,14 @@ void sortVectorKeepIndex(vector<int>& input, vPair& index, int max){
 			push = j * (*it);
 		}
 		else{
-			push = pow(2,j) * (*it);
+			push = pow(2,j-1) * (*it);
 		} 
 
 		index.push_back(make_pair(push, j-1));
 		j++;
+		#if DEBUG_HARD
+		cout << "\nvector index element[" << j-2 << "] = " << push << ", "; 
+		#endif
 	}
 	// Reset index for each vector from array
 	// Sort vector of pairs after first element

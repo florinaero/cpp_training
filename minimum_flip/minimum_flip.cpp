@@ -66,6 +66,7 @@ int main(int argc, char** argv){
     // readFile(PATH, input, noOfElements, noOfFlips);
 	readKeyboard(input, noOfElements, noOfFlips);
 #if DEBUG
+    cout << "\n Next log is on line: " << __LINE__ << endl; 
     cout << "Number of elements: " << noOfElements << endl;
     cout << "Number of flips: " << noOfFlips << endl;
 #endif
@@ -78,22 +79,23 @@ int main(int argc, char** argv){
 
 
 #if DEBUG
+    cout << "\n Next log is on line: " << __LINE__ << endl; 
     cout << "\nSize of subarrays and their position in vector in a sorted way. \n";
     for(int i=0;i<=max;i++){
 	 	cout <<"vCounter sorted[" << i <<"]: ";
 		for( vector<int>::iterator it=(vCounter[i]).begin();it!=(vCounter[i]).end();++it){
-			cout << *it << ",";
+			cout << *it << ", ";
 		}
 		cout << endl;
 	}
-	cout << "Number of Flips: " << noOfFlips << endl;
-	cout << "TOATAL SUM = " << minSum(vCounter, max) << endl; 
+	cout << "TOTAL SUM = " << minSum(vCounter, max) << endl; 
 #endif
 
 	removeFlippArrays(vCounter, noOfFlips, max);
 
 
 #if DEBUG
+	cout << "\n Next log is on line: " << __LINE__ << endl; 
     cout << "\nRemained elements. \n";
     for(int i=0;i<=max;i++){
 	 	cout <<"vCounter sorted[" << i <<"]: ";
@@ -127,9 +129,6 @@ long minSum(vector<int>* vLast, int max){
 				sumBits = sumBits + (*it);
 			}
 		}
-		#if DEBUG
-			cout << "number of bits for " << i << " = " << sumBits << endl;
-		#endif
 
 		if(i==0){
 			// Position 0 where value is 1 and shift not working
@@ -235,14 +234,18 @@ void allocation(long max, vector<int>& input, vector<int>* vCounter){
     long actualPos = 0;
     long lastPos = 0;
     int n = 0;
+    int sum = 0;
 
     // Read elements until the last one
     for(vector<int>::iterator It = input.begin();It!=input.end();++It){
     	elem = *It;
 		// Store all elements
 		allElem.push_back(elem);
-		actualPos = allElem.size()-1;
 
+		actualPos = allElem.size()-1;
+		#if DEBUG 
+		cout << "\nelement = " << elem ;
+		#endif
 		// Cycle each bit of an element 
 	    for(int i=0;i<=max;i++){
 	    	// Check if bit is set, result is a number > 0
@@ -267,7 +270,9 @@ void allocation(long max, vector<int>& input, vector<int>* vCounter){
 	    		if(split[i].size()>1){
 		    		// Last but one element stored in SET bit vector
 		    		lastPos = (split[i].end()[-2]);
-	   
+		    		#if DEBUG
+		    		cout << "\n[" << i << "] last = " << lastPos << ", actual = " << actualPos;
+	   				#endif
 		    		// Check if last 2 stored numbers from a vector with set bits are consecutive
 		    		// In this way you know the subarrays with same set bits 
 		    		if(consecutive(actualPos, lastPos))
@@ -337,11 +342,15 @@ void sortVectorKeepIndex(vector<int>& input, vPair& index, int max){
 			push = j * (*it);
 		}
 		else{
-			push = pow(2,j) * (*it);
+			push = pow(2,j-1) * (*it);
 		} 
 
 		index.push_back(make_pair(push, j-1));
 		j++;
+		#if DEBUG
+		cout << "\n Next log is on line: " << __LINE__ << endl;
+		cout << "element[" << j-2 << "] = " << push << ", "; 
+		#endif
 	}
 	// Reset index for each vector from array
 	// Sort vector of pairs after first element
