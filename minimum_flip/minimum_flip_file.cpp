@@ -18,7 +18,7 @@ cout << "Hi, " << name << ".\n";        // Writing output to STDOUT
 #include <fstream>
 #include <algorithm>
 #include <cmath>
-
+ 
 using namespace std;
 typedef vector< pair<int,int> > vPair;
 
@@ -138,9 +138,7 @@ long minSum(vector<int>* vLast, int max){
 			if((*it)>0){
 				sumBits = sumBits + (*it);
 			}
-		}
-
-				
+		}		
 
 		if(i==0){
 			// Position 0 where value is 1 and shift not working

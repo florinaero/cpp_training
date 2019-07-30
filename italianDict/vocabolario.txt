@@ -1,0 +1,40 @@
+o tabla = una lavagna
+un burete = un cancellino
+o creta = un gesso
+o banca = un banco
+o catedra = una cattedra
+un scaun = una sedia
+un catalog = un registro
+un calorifer = un termosifone 
+un cuier = un attaccapanni
+o soba = una stufa
+vesel = allegro
+fluviu = fiume
+pasiune = passione
+ceas = orologio
+apa = aqua
+actiune = azione
+inecat = annegato
+linistit = tranquillamente
+profesoara = professoressa
+meserie = mestiere
+artistic = artistico
+a aproba = approvare
+poate = puo
+mai = piu
+aceasta = cio
+deja = gia
+aici(cu exactitate) = qui
+aici(cu aproximatie) = qua
+clasa = aula
+dictionar dizionario
+bambus = bambu
+o carte = un libro
+creion = matita
+fereastra = finestra
+plafon = soffitto
+etaj = pavimento
+stilou = penna
+minge = palla
+
+

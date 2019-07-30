@@ -1,0 +1,4 @@
+class Dictionary{
+	// ctor
+	Dictionary();
+};
