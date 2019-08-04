@@ -1,4 +1,0 @@
-class Dictionary{
-	// ctor
-	Dictionary();
-};

@@ -27,7 +27,7 @@ deja = gia
 aici(cu exactitate) = qui
 aici(cu aproximatie) = qua
 clasa = aula
-dictionar dizionario
+dictionar = dizionario
 bambus = bambu
 o carte = un libro
 creion = matita
@@ -36,5 +36,3 @@ plafon = soffitto
 etaj = pavimento
 stilou = penna
 minge = palla
-
-

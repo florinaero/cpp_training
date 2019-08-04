@@ -4,6 +4,7 @@
 
 using namespace std;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Read file
 void Parser::readFile(vector<string>& content, string fileName){
 
@@ -22,6 +23,7 @@ void Parser::readFile(vector<string>& content, string fileName){
 
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Parser::splitInWords(vector<string>& content, unordered_map<string, string>& vocab, char delimiter){
 
 	vector<string>::iterator ItContent = content.begin();
@@ -46,7 +48,7 @@ void Parser::splitInWords(vector<string>& content, unordered_map<string, string>
 			vocab.emplace(word1, word2); 
 		}
 		else{
-			// cout << "Delimiter " << delimiter << " was not found in vector's line " << counter << endl; 
+			cout << "Delimiter " << delimiter << " was not found in vector's line " << counter << endl; 
 		}
 	}
 }
