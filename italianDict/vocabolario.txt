@@ -36,3 +36,4 @@ plafon = soffitto
 etaj = pavimento
 stilou = penna
 minge = palla
+parinti = parenti

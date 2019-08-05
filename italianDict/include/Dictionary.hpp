@@ -24,6 +24,7 @@ public:
 	
 	// Insert new pair of words
 	bool insertEntry();
-	// Search word function
 	bool searchWord(std::string searched);
+	// Search word function and return founded words in list
+	void showWordsStartWith(std::string& startWord, std::vector<std::string>& foundedWords);
 };							

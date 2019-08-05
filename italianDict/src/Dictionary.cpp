@@ -1,6 +1,7 @@
 #include "Dictionary.hpp"
 #include "Parser.hpp"
 #include <iostream>
+#include <boost/algorithm/string/predicate.hpp>
 
 using namespace std;
 
@@ -20,19 +21,26 @@ Dictionary::Dictionary(string firstLanguage, string secondLanguage, string autho
 	}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Write entry to the file 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Insert a new entry into dictionary
 bool Dictionary::insertEntry(){
-	bool isEmptyWord1 = true;
-	bool isEmptyWord2 = true;
+	bool isNotEmptyWord1 = false;
+	bool isNotEmptyWord2 = false;
 	string word1 = "";
 	string word2 = "";
-
+	string line = "";
 	
-	isEmptyWord1 = Dictionary::insertWord(word1, m_firstLanguage);
-	isEmptyWord2 = Dictionary::insertWord(word2, m_secondLanguage);
+	isNotEmptyWord1 = Dictionary::insertWord(word1, m_firstLanguage);
+	isNotEmptyWord2 = Dictionary::insertWord(word2, m_secondLanguage);
 	// If both words are not empty 
-	if(!(isEmptyWord1 || isEmptyWord2)){
+	if(isNotEmptyWord1 && isNotEmptyWord2){
 		m_vocab.emplace(word1, word2);
+		line = word1 + " = " + word2;
+		// Write entry to file
+		Parser::writeLine(line, m_fileName);
 		return true;
 	}
 	else{
@@ -42,18 +50,35 @@ bool Dictionary::insertEntry(){
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Search word in dictionary
 bool Dictionary::searchWord(string searched){
 	unordered_map<string, string>::iterator itElem = m_vocab.find(searched);
 
 	if(itElem!=m_vocab.end()){
+		cout << endl << "###################" << endl;
 		cout << "Italian word: ";
-		cout << (*itElem).second << endl;
+		cout << (*itElem).second;
+		cout << endl <<"###################" << endl;
 	}
 	else{
-		cout << "Elem was not found." << endl;
+		cout << "Element was not found." << endl;	
 	}
 
 	return false;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void Dictionary::showWordsStartWith(string& startWord, vector<string>& resultedWords){
+
+	bool isIn = false;
+
+	for(auto const& it : m_vocab){
+		isIn = boost::algorithm::starts_with(it.first, startWord);
+		// Store word if is founded in list
+		if(isIn){
+			resultedWords.push_back(it.first);
+		}
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -63,12 +88,13 @@ bool Dictionary::insertWord(string& newWord, string wordLanguage){
 	cout << "Insert " <<wordLanguage << " word: ";
 	// Read word from keyboard
 	cin >> newWord;
-	// Check if size of word is larger than 0 and return status
-	if(!newWord.size()){
-		return false;
-	}
-	else{
+	// Check if size of word is larger than 0 and return TRUE
+	if(newWord.size()){
 		return true;
+	}
+	// Return FALSE for empty words
+	else{
+		return false;
 	}
 }
 

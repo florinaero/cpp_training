@@ -15,4 +15,7 @@ public:
 	// Split content into words considering delimiter
 	static void splitInWords(std::vector<std::string>& content, std::unordered_map<std::string,std::string>& vocab,
 							 char delimiter);
+	
+	// Write line to the end of the file
+	static void writeLine(std::string& line, std::string fileName);
 };

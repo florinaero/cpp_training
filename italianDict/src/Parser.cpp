@@ -19,6 +19,7 @@ void Parser::readFile(vector<string>& content, string fileName){
 	else{
 		cout << "File couldn't open!";
 	}
+
 	file.close();
 
 }
@@ -53,3 +54,18 @@ void Parser::splitInWords(vector<string>& content, unordered_map<string, string>
 	}
 }
 	
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+// Write line to the end of the file
+void Parser::writeLine(string& line, string fileName){
+
+	ofstream file (fileName, ios::app);
+
+	if(file){
+		file << endl << line;
+	}
+	else{
+		cout << "File couldn't open!";	
+	}
+
+	file.close();
+}
