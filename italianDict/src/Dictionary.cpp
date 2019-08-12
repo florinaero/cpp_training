@@ -19,7 +19,6 @@ Dictionary::Dictionary(string firstLanguage, string secondLanguage, string autho
 		// Parse the content and store it 
 		Parser::splitInWords(m_fileContent, m_vocab, m_delimiter);
 	}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Write entry to the file 

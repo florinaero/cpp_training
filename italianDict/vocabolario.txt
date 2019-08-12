@@ -37,3 +37,4 @@ etaj = pavimento
 stilou = penna
 minge = palla
 parinti = parenti
+relatie = relazione

@@ -39,7 +39,7 @@ public:
 
 
 	void initialize(){
-		m_fileName = "input2.txt";
+		m_fileName = "input/input2.txt";
 	}
 
 	void readingFile(){
@@ -55,16 +55,19 @@ public:
 			}
 		}
 		else{
-			cout << "File couldn't open!";
+			cout << "File couldn't open!" << endl;
 		}
 		file.close();
 	}
 
 	void readingInput(){
 		string name;
+		int counter{0};
 		cin >> m_totalStudents;
-		while(cin >> name){
+		while((cin >> name) && (counter<m_totalStudents-1))
+		{
 			m_names.push_back(name);
+			counter++;
 		}
 	}
 
@@ -106,8 +109,8 @@ public:
 	m_totalStudents(0)
 	{
 		initialize();
-		// readingFile();
-		readingInput();
+		readingFile();
+		// readingInput();
 		m_hashTable.resize(m_totalStudents);
 
 		// cout << "no of students = " << m_totalStudents << endl;

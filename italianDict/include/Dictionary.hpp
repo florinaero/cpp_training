@@ -11,7 +11,7 @@ private:
 	std::unordered_map<std::string, std::string> m_vocab;
 	std::vector<std::string> m_fileContent;
 	const std::string m_fileName;
-	const char m_delimiter;
+	const char m_delimiter{0};
 
 	// Read a word from keyboard
 	bool readWord(std::string& word);
