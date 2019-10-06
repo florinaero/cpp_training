@@ -25,8 +25,10 @@ y-coordinate and third integer defines the frequency of (x,y). Constraints:
 #include <range.hpp>
 #include <cmath>
 #include <algorithm>
+#include <chrono>
 
-#define N 1000
+// N=100 gives a better time
+#define N 100
 
 using namespace std;
 
@@ -63,6 +65,7 @@ public:
 		if(file){
 			// Read number of pairs
 			file >> noCoord;
+			noCoord = 199999;
 			hashTable.resize(noCoord, INIT);
 			coordFreq.resize(noCoord);
 
@@ -77,7 +80,7 @@ public:
 				}
 				temp++;
 				if(temp>199990){
-					cout<<temp<<endl;		
+					// cout<<temp<<endl;		
 				}	
 			}	
 		}
@@ -118,7 +121,7 @@ public:
 	}
 
 	int hashing2(int elem1, int elem2)const{
-		return (31*elem1 + elem2) % 2069 % noCoord; 
+		return (31*abs(elem1) + abs(elem2)) % noCoord; 
 	}
 
 	void insert(pair<int,int>& insertedPair, int position){
@@ -176,11 +179,17 @@ public:
 
 int main(){
 
+	chrono::steady_clock::time_point begin = chrono::steady_clock::now();
+
 	HashCoord *object = new HashCoord();
-	object->readFile("input/input2.txt");
+	object->readFile("input/input1.txt");
 	cout << "Show results" << endl;
-	object->showResults();
+	// object->showResults();
 	delete object;
+
+	chrono::steady_clock::time_point end = chrono::steady_clock::now();
+	
+	cout << "Elapsed time = " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 	
 	return 0;
 }

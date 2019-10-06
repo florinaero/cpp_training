@@ -25,7 +25,7 @@ y-coordinate and third integer defines the frequency of (x,y). Constraints:
 #include <cmath>
 #include <algorithm>    // std::sort
 
-#define N 1000
+#define N 100
 
 using namespace std;
 
@@ -62,6 +62,7 @@ public:
 
 		// Read number of pairs
 		cin >> noCoord;
+		noCoord = 100003;
 		hashTable.resize(noCoord, INIT);
 		coordFreq.resize(noCoord);
 
@@ -87,7 +88,7 @@ public:
 		const int modDigits = pow(10,logTotal);
 
 		// hash1 = (1991*elem1 + elem2) % 2069 % noCoord; 
-		// Add 10000 to have at least "logTotal" 
+		// Add N to have at least "logTotal" 
 		temp = pow(double(abs(elem1)+abs(elem2) + N),2);
 		// Find number of digits
 		digits = floor(log10(temp))+1;
@@ -111,7 +112,7 @@ public:
 	}
 
 	int hashing2(int elem1, int elem2)const{
-		return (31*elem1 + elem2) % 2069 % noCoord; 
+		return (31*abs(elem1) + abs(elem2)) % noCoord; 
 	}
 
 	void insert(pair<int,int>& insertedPair, int position){

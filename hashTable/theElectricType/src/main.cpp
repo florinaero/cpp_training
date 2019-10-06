@@ -20,11 +20,14 @@ Constraints: 1 ≤ N ≤ 2 * 10E+5 1 ≤ Ai ≤ 10E+9
 5 1 2 2 1 3 SAMPLE OUTPUT  6 Explanation All the possible pairs are 
 (1,1), (1,2), (1,3), (2,1), (2,2), (2,3). */
 
+#define DEBUG 1
+#define INFO
 #include <fstream> 
 #include <vector> 
 #include <string> 
 #include <iostream>
 #include <utility>
+#include <algorithm>
 
 using namespace std;
 
@@ -38,7 +41,7 @@ protected:
 	
 
 public: 
-	vector< pair<int,int> > m_hashTable;
+	vector< vector<pair<int,int>> > m_hashTable;
 
 	// ctor 
 	Electric(string pathFile): m_pathFile(pathFile) {	
@@ -48,12 +51,13 @@ public:
 
 		// Create hash table with the maximum of possible pairs
 		pair<int,int> tempPair(0,0);
-		m_hashTable.resize(m_noOfPairs,tempPair);
+		m_hashTable.resize(m_noOfPairs);
+		cout << m_noOfElements << endl;
 	}
 
 	// hash function 
 	long hashing(int elem1, int elem2, int index1, int index2){
-		return ((elem1+elem2+index1+index2) % 2069 % m_noOfPairs);
+		return ((2*elem1+elem2) % m_noOfPairs);
 	}
 
 	// Insert function in hash table 
@@ -64,23 +68,28 @@ public:
 		pair<int,int> newPair(elem1, elem2);
 
 		index = hashing(elem1, elem2, index1, index2);
+		// cout << index << " " << elem1 << " "<<elem2<<" "<<index1<<" "<<index2<<endl;
 
 		try{
-			// Check if the new pair is already in hash table
-			while(m_hashTable.at(index)!=newPair && m_hashTable.at(index)!=make_pair(0,0)){
-				// Linear probing 	
-				index = (index + 1) % m_noOfPairs;
-				pwr++;
-				// cout << "index: " << index <<" pwr: " << pwr << endl;
-				if(pwr>3000){
-					cout << "";
-				} 
-			}
-			if(newPair==m_hashTable.at(index)){
-				cout << "same pair" << endl;
-			}
+			// // Check if the new pair is already in hash table
+			// while((m_hashTable.at(index)!=newPair) && !(m_hashTable.at(index)==make_pair(0,0))){
+			// 	// Linear probing 	
+			// 	index = (index + 1) % m_noOfPairs;
+			// 	pwr++;
+			// 	// cout << "index: " << index <<" pwr: " << pwr << endl;
+			// 	// cout << "newPair: " <<"(" << newPair.first << "," << newPair.second << ")" << endl;
+			// 	// cout << "m_hashTable: "<< "(" << m_hashTable.at(index).first << "," 
+			// 	// << m_hashTable.at(index).second << ")" << endl;
+			// }
+			// if(newPair==m_hashTable.at(index)){
+			// 	cout << "same pair" << endl;
+			// }
+			// cout << index << endl;
+			// cout << "newPair: " <<"(" << newPair.first << "," << newPair.second << ")" << endl;
+			// cout << "m_hashTable: "<< "(" << m_hashTable.at(index).first << "," 
+			// << m_hashTable.at(index).second << ")" << endl;
 			// Insert pair in hashTable
-			m_hashTable.at(index) = make_pair(elem1,elem2);
+			m_hashTable.at(index).push_back(newPair);
 		}
 		catch(out_of_range oor){
 			cout << "Out of range at line " << __LINE__;
@@ -97,6 +106,7 @@ public:
 
  		ofstream file("input/output_dbg");
 
+		cout << "m_elements = " << m_elements.size() << endl;
  		try{
 	 		for(;It!=m_elements.end()-1;++It){
 	 			index1 = It - m_elements.begin();
@@ -133,7 +143,8 @@ public:
 		else{ 
 			cout << "File couldn't open!" << endl; 
 		}
-
+		cout << "reading done" << endl;
+		cout << "Number of pairs: "<<m_noOfPairs << endl;
 		file.close(); 
 	} 
 };
@@ -144,18 +155,23 @@ int main(){
 	int counter1{0};
 	int counter2{0};
 
-	Electric probl("input/input1.txt");
+	Electric probl("input/input6.txt");
 	probl.processElem();
 
 	ofstream file ("input/output1.txt");
 
-	for(auto & it : probl.m_hashTable){
-		file << "(" << it.first << "," << it.second << ")" << endl;
-		if(it!=make_pair(0,0)){
-			counter1++;
-		}
-		else{
-			counter2++;
+
+	for(auto & row : probl.m_hashTable){
+		sort(row.begin(),row.end());
+		row.erase(unique(row.begin(),row.end()),row.end());
+		for(auto & it : row){
+			file << "(" << it.first << "," << it.second << ")" << endl;
+			if(it!=make_pair(0,0)){
+				counter1++;
+			}
+			else{
+				counter2++;
+			}
 		}
 	}
 
