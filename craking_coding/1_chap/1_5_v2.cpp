@@ -36,25 +36,24 @@ bool check(string& input1, string& input2){
 		return true;
 	}
 
+	// Concatenation of strings
 	concat = input1 + input2;
 	
-	// 
+	// Exclusive OR for toogling the presence of letter in alphabet
+	// 1=odd number of same letter; 0=even number of same letter
 	for(auto i : concat){
 		letters.at('z'-i) ^= 1;
 	}
 
+	// Count how many letters are different
 	for(auto i : letters){
 		cout << i << " " ;
-		// Sum up counting of letters
+		// Sum up letters
 		sum += i;
-		if(i!=0){
-			counter += 1;
-		}
 	}
 
 	cout << endl;
-	cout << "counter = " << counter << endl;
-	cout << "sum = " << sum << endl;
+	cout << "different letters = " << sum << endl;
 
 
 	// One replacement is neccesary; identical strings already checked
@@ -82,6 +81,6 @@ int main(){
 
 	result = check(input1, input2);
 
-	cout << boolalpha << endl << result;
+	cout << boolalpha << result<<endl;
 	return 0;
 }
