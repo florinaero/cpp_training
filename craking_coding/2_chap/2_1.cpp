@@ -4,6 +4,8 @@
 			How would you solve this problem if a temporary buffer is
 			not allowed? 
 			It is done using 2 raw pointers.
+@author 	Marcu Cristian 
+@date 		Oct,2019
 */
 #include <vector>
 #include <iostream>
