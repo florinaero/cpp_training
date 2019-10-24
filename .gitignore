@@ -4,3 +4,4 @@
 *.obj
 #precompiled headers
 *.gch
+*.o.dSYM
