@@ -10,6 +10,6 @@
    		
 ## **Issues:**
 
-	1. "Undeclared type name" error after into an .hpp was used `#ifdef FILENAME_` instead of `#ifndef FILENAME_`. Whole code was excluded by preprocessor directive.  
-	
+	1. "Undeclared type name" error after it was used '#ifdef FILENAME_' into an .hpp, instead of `#ifndef FILENAME_`. Whole code was excluded by preprocessor directive.  
+
 	2.	
