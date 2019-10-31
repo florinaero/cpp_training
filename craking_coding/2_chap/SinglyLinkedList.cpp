@@ -45,6 +45,7 @@ shared_ptr<Node> SinglyLinkedList::remove(int data){
 	return head;
 }
 
+// Search key in list and returns pointer to found node
 shared_ptr<Node> SinglyLinkedList::search(int data){
 	shared_ptr<Node> dum;
 
