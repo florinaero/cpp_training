@@ -11,22 +11,31 @@
 #include <iostream>
 #include <cmath>
 #include "fileManager.hpp"
+#include "bst.hpp"
 
 using namespace std;
 
-class Tree{
-public:
-	/**
-	@brief				Find number of levels for a binary tree
-	@param[in] 	nodes	Number of nodes of a binary tree
-	@return				Number of levels for a binary tree considering root. 
-	*/
-	int findLevels(int nodes){
-		return ceil(log(nodes+1)/log(2));	
+
+shared_ptr< TreeNode<long> > createMinimalBst(vector<long> array, int start, int end){
+	static int i = 0;
+	if(end<start){
+		return nullptr;
 	}
+	// cout << "start = " << start << "  end = " << end << endl;
 
-};
+	int mid = (start+end)/2;
+	// cout << "mid = " << mid << endl;	
+	shared_ptr< TreeNode<long> > node = make_shared< TreeNode<long> >(array.at(mid));
+	node->m_left = createMinimalBst(array, start, mid-1);
+	node->m_right = createMinimalBst(array, mid+1, end);
 
+	// cout << "    node = " << node->m_key << endl;
+	return node;
+}
+
+shared_ptr< TreeNode<long> > createMinimalBst(vector<long> array){
+	return createMinimalBst(array,0,array.size()-1);
+}
 
 int main(int argc, char** argv){	
 
@@ -42,7 +51,6 @@ int main(int argc, char** argv){
 	vector< vector<int> > adjList;
 	vector<long> listNodes;
 
-	Tree tr;
 	vector< vector<long> > fileMatrix;
 	 
 	// Get input
@@ -50,71 +58,25 @@ int main(int argc, char** argv){
 	if(!status){
 		return 0;	
 	}
+	// First line of file has total number of nodes
+	nodes = fileMatrix.at(0).size();
 
-	// First line of file is number of nodes
-	nodes = fileMatrix.at(0).at(0);
-	// Resize adjacency list with no of nodes
-	adjList.resize(nodes);
+	Bst<long> tree;
+	tree.setLevels(nodes);
+	shared_ptr< TreeNode<long> > root;
 
-	listNodes = fileMatrix.at(1);
+	// Create BST 
+	root = createMinimalBst(fileMatrix.at(0));
 
-	// Find root position in vector by considering parity of # nodes.
-	if(nodes%2==0){
-		// Left half smaller by one node than left
-		rootPos = nodes/2 -1;
-		// Number of nodes for right half is equal with position of root 
-		rightNoLvl = tr.findLevels(rootPos);
-		leftNoLvl= rightNoLvl + 1;		 
-	}
-	else{
-		rootPos = floor(nodes/2);
-		rightNoLvl = tr.findLevels(rootPos);
-		leftNoLvl= rightNoLvl;		 	
-	}
-
+	// Print content of input array
 	for(auto &line : fileMatrix){
 		for(auto &elem : line){
 			cout << elem << " ";
 		}
 		cout << endl;
 	}
+	// cout << "levels = " << tree.m_levels << endl;
 
-	cout << "root node = " << rootPos << endl;
-	cout << "No. of right and left levels: " << rightNoLvl << " " << leftNoLvl << endl;
-	cout << endl;
-
-	int firstNodeLvl;
-	firstNodeLvl = rootPos - 1;
-	int children = 0;
-	int counter = 0;
-	
-	// Create right half of tree
-	for(int lvl=0;lvl<rightNoLvl-1;lvl++){	
-		nodesLvl = pow(2,lvl);	// Number of nodes for each level
-		if(lvl>0){
-			firstNodeLvl = firstNodeLvl - nodesLvl;	// Get position of first node of level
-		}
-		children = 2 * nodesLvl;	// Numebr of possible children for nodes of a level
-		counter = 0;
-		cout << "\nnodesLvl = " << nodesLvl << endl;
-		cout << "firstNodeLvl = " << firstNodeLvl << endl;
-		for(int j=0;j<nodesLvl;j++){	// Loop through all nodes of level
-			actNode = firstNodeLvl + j;	// Pos. of node on its level, relative to 1st node
-			cout << "node = " << listNodes.at(actNode) << endl;
-			for(int k=counter;k<counter+2;k++){	// Child relativ to firstNodeLvl
-				child = firstNodeLvl - (nodesLvl+k);
-				if(child < 0){	// Check for last node
-					cout << "last node = " << listNodes.at(child+1); 
-					return 0;
-				}
-				// Store children		
-				adjList.at(actNode).push_back(listNodes.at(child));	
-				// cout << "pos  = " << child; 
-				cout << " child = " << listNodes.at(child) << endl;
-			}				
-			counter = counter + 2;	// increase by 2 to move at next pair of children
-		}
-	}		
-
+	tree.showBst(root);
 	return 0;
 }
