@@ -5,3 +5,4 @@
 #precompiled headers
 *.gch
 *.o.dSYM
+**/*.out.dSYM
