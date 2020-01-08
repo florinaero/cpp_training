@@ -6,7 +6,7 @@ CSRC := $(wildcard $(SRCDIR)*.cpp) #find all cpp files
 LIBS := -lncurses
 
 CC=g++
-CFLAGS=-I $(IDIR) -std=c++11 -g 	
+CFLAGS=-I $(IDIR) -std=c++17 -g -W
 EXSRC = $(shell if [ ! -d "$(SRCDIR)" ]; then echo "Must create src directory!" ; fi)
 EXOBJ = $(shell if [ ! -d "$(ODIR)" ]; then mkdir $(ODIR) && echo "obj dir created" ; fi)
 EXINCL = $(shell if [ ! -d "$(IDIR)" ]; then echo "Must create include directory!" ; fi)

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <curses.h>
 #include "snake.hpp"
 
 using namespace std;
@@ -11,14 +12,42 @@ int main(){
 	const char DOWN = 's';
 	const char LEFT = 'a';
 	const char RIGHT = 'd';
+
 	int width = 0;
 	int height = 0;
-	char tmp = 0;
+	char tmp = DOWN;
+	char oldInput = 0;
 
-	// Create snake object 
-	Snake snake;
+	// Create snake object with wait time in mills
+	Snake snake(100);
 
-	snake.intitScreen();
+	while(tmp!='p'){
+		// Check if nothing or wrong key was pressed, then keep previous command
+		if(tmp==ERR || (tmp!=UP && tmp!=DOWN && tmp!=RIGHT && tmp!=LEFT)){
+			tmp = oldInput;
+		}
+		else{
+			oldInput = tmp;
+		}
+		switch(tmp){
+			case UP: 
+				snake.goUp();
+				break;
+			case DOWN:
+				snake.goDown();
+				break;
+			case LEFT: 
+				snake.goLeft();
+				break;
+			case RIGHT: 
+				snake.goRight();
+				break;
+			default: // do nothing
+				break;
+		}
+		// Get direction from input
+		tmp = getch();
+	}
 
 	// Return to original screen
 	snake.clearScreen();
