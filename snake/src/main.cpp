@@ -15,11 +15,11 @@ int main(){
 
 	int width = 0;
 	int height = 0;
-	char tmp = DOWN;
+	char tmp = UP;
 	char oldInput = 0;
 
 	// Create snake object with wait time in mills
-	Snake snake(100);
+	Snake snake(200);
 
 	while(tmp!='p'){
 		// Check if nothing or wrong key was pressed, then keep previous command

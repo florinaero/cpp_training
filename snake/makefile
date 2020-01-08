@@ -21,7 +21,7 @@ $(ODIR)%.o: $(SRCDIR)%.cpp $(DEPS) 	#Define rule that creates object files
 # Compile cpp files and names as the name from left of :
 	$(CC) -c -o $@ $< $(CFLAGS)
 	
-result: rule $(OBJ)
+result.o: rule $(OBJ)
 	$(CC) -o  $@ $(OBJ) $(CFLAGS) $(LIBS)
 	$(CHMOD)
 	@echo "Success!"
