@@ -19,9 +19,10 @@ int main(){
 	char oldInput = 0;
 
 	// Create snake object with wait time in mills
-	Snake snake(200);
-
-	while(tmp!='p'){
+	Snake snake(400);
+	
+	// Exit with 'q'
+	while(tmp!='q'){
 		// Check if nothing or wrong key was pressed, then keep previous command
 		if(tmp==ERR || (tmp!=UP && tmp!=DOWN && tmp!=RIGHT && tmp!=LEFT)){
 			tmp = oldInput;

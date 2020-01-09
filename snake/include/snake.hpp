@@ -3,11 +3,18 @@
 using namespace std;
 
 class Snake{
+private:
+	static const int m_snakeSize;
+	struct Coord{
+		int x_coord;
+		int y_coord;
+		Coord(int x_coord, int y_coord);
+	};
 public:
 	int m_width;
 	int m_height;
 	int m_waitTimeMills;
-	static const int m_snakeSize;
+	
 	// Coordinates of snake on screen
 	vector<pair<int,int> > m_snakeCoord;
 	// Snake symbol
