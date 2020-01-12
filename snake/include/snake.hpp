@@ -2,28 +2,36 @@
 #include <utility>
 using namespace std;
 
+// Define keys(inline constexpr available only for c++17) 
+inline constexpr wchar_t UP = 'w';
+inline constexpr wchar_t DOWN = 's';
+inline constexpr wchar_t LEFT = 'a';
+inline constexpr wchar_t RIGHT = 'd';
+inline constexpr wchar_t STOP_KEY = 'q';
+
 class Snake{
 private:
-	static const int m_snakeSize;
+	static const int snake_size_;
 	struct Coord{
 		int x_coord;
 		int y_coord;
 		Coord(int x_coord, int y_coord);
 	};
+	wchar_t head_position_;
 public:
-	int m_width;
-	int m_height;
-	int m_waitTimeMills;
+	int width_;
+	int height_;
+	int wait_time_mills_;
 	
 	// Coordinates of snake on screen
 	vector<pair<int,int> > m_snakeCoord;
 	// Snake symbol
-	static const vector<char> m_snakeSymbol;
+	static const vector<char> snake_symbol_;
 	// Origin point 
 	static const int m_originPoint;
 
 	// Ctor
-	Snake(int waitTimeMills);
+	Snake(int waitTimeMills, wchar_t head_position);
 
 	// Intialize screen using curses
 	void intitScreen();
@@ -39,5 +47,4 @@ public:
 	void goUp();
 	void goLeft();
 	void goRight();
-
 };
