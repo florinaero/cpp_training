@@ -8,29 +8,26 @@ using namespace std;
 
 int main(){
 	const int size = 0;
-	const char UP = 'w';
-	const char DOWN = 's';
-	const char LEFT = 'a';
-	const char RIGHT = 'd';
-
+	
 	int width = 0;
 	int height = 0;
-	char tmp = UP;
+	wchar_t initial_direction = UP;
+	char key_start = ERR;
 	char oldInput = 0;
 
-	// Create snake object with wait time in mills
-	Snake snake(400);
+	// Create snake object with wait time in mills and initial direction
+	Snake snake(400, initial_direction);
 	
-	// Exit with 'q'
-	while(tmp!='q'){
+	// Exit with STOP_KEY
+	while(initial_direction!=STOP_KEY){
 		// Check if nothing or wrong key was pressed, then keep previous command
-		if(tmp==ERR || (tmp!=UP && tmp!=DOWN && tmp!=RIGHT && tmp!=LEFT)){
-			tmp = oldInput;
+		if(initial_direction==ERR || (initial_direction!=UP && initial_direction!=DOWN && initial_direction!=RIGHT && initial_direction!=LEFT)){
+			initial_direction = oldInput;
 		}
 		else{
-			oldInput = tmp;
+			oldInput = initial_direction;
 		}
-		switch(tmp){
+		switch(initial_direction){
 			case UP: 
 				snake.goUp();
 				break;
@@ -47,7 +44,7 @@ int main(){
 				break;
 		}
 		// Get direction from input
-		tmp = getch();
+		initial_direction = getch();
 	}
 
 	// Return to original screen
