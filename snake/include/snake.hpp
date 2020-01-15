@@ -11,7 +11,6 @@ inline constexpr wchar_t STOP_KEY = 'q';
 
 class Snake{
 private:
-	static const int snake_size_;
 	struct Coord{
 		int x_coord;
 		int y_coord;
@@ -24,7 +23,7 @@ public:
 	int wait_time_mills_;
 	
 	// Coordinates of snake on screen
-	vector<pair<int,int> > m_snakeCoord;
+	vector<pair<int,int> > snake_coord_;
 	// Snake symbol
 	static const vector<char> snake_symbol_;
 	// Origin point 
@@ -44,7 +43,7 @@ public:
 	// Refresh screen and wait time 
 	void refreshAndWait();
 	// Update position of chars on screen 
-	void moveChar(int yCoord, int xCoord, wchar_t symbol); 
+	void moveChar(int yCoord, int xCoord, char symbol); 
 	void goDown();
 	void goUp();
 	void goLeft();

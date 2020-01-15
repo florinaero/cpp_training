@@ -13,18 +13,18 @@ todo: Remove duplicated lines of changing direction func
 todo: Remove fixed dimmension of snake_symbol_
 todo: Define window size from begining
 todo: Check why arrows are not working(keypad())
-todo: Implement smooth transition for direction change
-bug: Wrong transition at end of screen's right
+Solved: todo: Implement smooth transition for direction change
+Solved: bug: Wrong transition at end of screen's right
 		-> not observed on ubuntu
-bug: When sense is changed on same direction then the direction's
-	cange is happening at the opposite head.
-bug: Direction change one after another makes symbols to dissapear. 
+Solved: bug: When sense is changed on same direction then the direction's
+		change is happening at the opposite head.
+Solved: bug: Direction change one after another makes symbols to dissapear. 
 */
 using namespace std;
 
-const int Snake::snake_size_ = 4;
 // Snake symbol
-const vector<char> Snake::snake_symbol_={'*', '*', '*', 'o'};
+// const vector<char> Snake::snake_symbol_={'0', '1', '2', '3'};
+const vector<char> Snake::snake_symbol_={'*', '*', '*','*', '*', '*', 'o'};
 
 // Coordinates constructor
 Snake::Coord::Coord(int x_coord, int y_coord):
@@ -41,9 +41,9 @@ wait_time_mills_(waitTimeMills)
 	// Init screen for ncurses
 	Snake::intitScreen();
 	// Define coordinates of snake on vertical
-	for(int i=0;i<Snake::snake_size_;i++){
+	for(size_t i=0;i<snake_symbol_.size();i++){
 		// Start from middle of window
-		m_snakeCoord.push_back(make_pair(width_/2, height_/2+i));
+		snake_coord_.push_back(make_pair(width_/2, height_/2+i));
 	} 
 }
 
@@ -86,182 +86,154 @@ void Snake::refreshAndWait(){
 	clear();
 }
 
-void Snake::moveChar(int yCoord, int xCoord, wchar_t symbol){
+void Snake::moveChar(int yCoord, int xCoord, char symbol){
 	mvaddch(yCoord, xCoord, symbol);
 }
 
 void Snake::goDown(){
-	auto coord = m_snakeCoord.begin();
-	auto symbol =  snake_symbol_.begin();
-	int yCoord = 0;
-	int xCoord = 0;
-	int head = 0;
+	bool first = true;
+	auto temp = snake_coord_.at(0);
 
 	// Update head position
-	head_position_ = DOWN;
-	// Get position of head of previous snake's position on x axis
-	head = m_snakeCoord.back().first;
-	// Update coordinates of symbols by increasing y coord
-	for(;coord!=m_snakeCoord.end()&&symbol!=snake_symbol_.end();++coord,++symbol){
-		xCoord = coord->first;
-		yCoord = coord->second;
-		// Keep same x axis as before(head) going down and modify
-		//	the rest of body by shifting points to head coordinate
-		if(head!=xCoord){
-			// Check sense of movement of snake, 1st case move to left
-			if(head<xCoord){
-				xCoord--;	// Move point to left
-			}
-			else{				
-				xCoord++;	// Move point to right
-			}
+	head_position_ = UP;
+
+	// Update coordinates of symbols by changing head's coord and copying coordinates
+	//	of symbols from tail to head, follow head.
+	for(int i=snake_coord_.size()-1;i>=0;i--){
+		auto coord = snake_coord_.at(i);
+		// Change coordinate just for head, for the rest copy the previous coord
+		// 	of head, head-1
+		if(first){
+			first = false;
+			// Store previous value before changing coord
+			temp = snake_coord_.at(i);
+			// Decrease y coordinate to move to top of screen
+			coord.second++;
+			// Check for bottom of screen and move to top 
+			if(coord.second == height_){
+				coord.second = 0;
+			}	
 		}
 		else{
-			xCoord = head;			
-			yCoord ++;	// Move point to bottom
+			// Assign previous coordinates
+			coord = temp;
+			temp = snake_coord_.at(i);
 		}
-		// Check for bottom of screen and move to top 
-		if(yCoord == height_-1){
-			yCoord = 0;
-		}
-		// Store coordinates to vector
-		coord->first = xCoord;
-		coord->second = yCoord;
-		// Move characters to next position(y,x)
-		moveChar(yCoord, xCoord, *symbol); 
+		// Store new coordinates
+		snake_coord_.at(i) = coord;
+		moveChar(coord.second, coord.first, snake_symbol_.at(i)); 
+
 	}
 	refreshAndWait();
 }
 
 void Snake::goUp(){
-	auto coord = m_snakeCoord.begin();
-	auto symbol =  snake_symbol_.begin();
-	int yCoord = 0;
-	int xCoord = 0;
-	int head = 0;
+	bool first = true;
+	auto temp = snake_coord_.at(0);
 
 	// Update head position
 	head_position_ = UP;
-	// Get actual x coord in order to define column number used for
-	//	vertical movement
-	head = m_snakeCoord.back().first;
-	// Update coordinates of symbols by decreasing y coord
-	for(;coord!=m_snakeCoord.end()&&symbol!=snake_symbol_.end();++coord,++symbol){
-		xCoord = coord->first;
-		yCoord = coord->second;
-		// Keep X coordinate of head before going up and modify
-		//	the rest of body by shifting points to head coordinate
-		if(head!=xCoord){
-			// Check sense of movement of snake, 1st case move to left
-			if(head<xCoord){
-				xCoord--;	// Move point to left
-			}
-			else{
-				xCoord++;	// Move point to right
-			}
+
+	// Update coordinates of symbols by changing head's coord and copying coordinates
+	//	of symbols from tail to head, follow head.
+	for(int i=snake_coord_.size()-1;i>=0;i--){
+		auto coord = snake_coord_.at(i);
+		// Change coordinate just for head, for the rest copy the previous coord
+		// 	of head, head-1
+		if(first){
+			first = false;
+			// Store previous value before changing coord
+			temp = snake_coord_.at(i);
+			// Decrease y coordinate to move to top of screen
+			coord.second--;
+			// Check for bottom of screen and move to top 
+			if(coord.second == 0){
+				coord.second = height_ - 1;
+			}	
 		}
 		else{
-			xCoord = head;
-			yCoord--;	// Move point to top
+			// Assign previous coordinates
+			coord = temp;
+			temp = snake_coord_.at(i);
 		}
-		// Check for bottom of screen and move to top 
-		if(yCoord == 0){
-			yCoord = height_ - 1;
-		}
-		// Store coordinates to vector
-		coord->first = xCoord;
-		coord->second = yCoord;
-		// Move characters to next position(y,x)
-		moveChar(yCoord, xCoord, *symbol); 
+		// Store new coordinates
+		snake_coord_.at(i) = coord;
+		moveChar(coord.second, coord.first, snake_symbol_.at(i)); 
 	}
 	refreshAndWait();
 }
 
 void Snake::goLeft(){
-	auto coord = m_snakeCoord.begin();
-	auto symbol =  snake_symbol_.begin();
-	int yCoord = 0;
-	int xCoord = 0;
-	int head = 0;
+	bool first = true;
+	auto temp = snake_coord_.at(0);
 
 	// Update head position
 	head_position_ = LEFT;
-	// Get actual y coord in order to define column number used for
-	//	horizontal movement
-	head = m_snakeCoord.back().second;	
-	// Update coordinates of symbols by decreasing x coord
-	for(;coord!=m_snakeCoord.end()&&symbol!=snake_symbol_.end();++coord,++symbol){
-		xCoord = coord->first;
-		yCoord = coord->second;
-		// Keep same y axis as before(head) and modify
-		//	the rest of body by shifting points to head coordinate
-		if(head!=yCoord){
-			// Check sense of movement of snake
-			if(head<yCoord){
-				yCoord--; 
-			}
-			else{
-				yCoord++;
-			}
+
+	// Update coordinates of symbols by changing head's coord and copying coordinates
+	//	of symbols from tail to head, follow head.
+	for(int i=snake_coord_.size()-1;i>=0;i--){
+		auto coord = snake_coord_.at(i);
+		// Change coordinate just for head, for the rest copy the previous coord
+		// 	of head, head-1
+		if(first){
+			first = false;
+			// Store previous value before changing coord
+			temp = snake_coord_.at(i);
+			// Decrease y coordinate to move to top of screen
+			coord.first--;
+			// Check for bottom of screen and move to top 
+			if(coord.first == 0){
+				coord.first = width_ - 1;
+			}	
 		}
 		else{
-			yCoord = head;
-			xCoord--;	// Move point to chosen sense of movement
+			// Assign previous coordinates
+			coord = temp;
+			temp = snake_coord_.at(i);
 		}
-		// Check for edge of screen and move to oposite 
-		if(xCoord == 0){
-			xCoord = width_-1;
-		}
-		// Store coordinates to vector
-		coord->first = xCoord;
-		coord->second = yCoord;
-		// Move characters to next position(y,x)
-		moveChar(yCoord, xCoord, *symbol);  
+		// Store new coordinates
+		snake_coord_.at(i) = coord;
+		moveChar(coord.second, coord.first, snake_symbol_.at(i)); 
 	}
 	refreshAndWait();
 }
 
 void Snake::goRight(){
-	auto coord = m_snakeCoord.begin();
-	auto symbol =  snake_symbol_.begin();
-	int yCoord = 0;
-	int xCoord = 0;
-	int head = 0;
+	bool first = true;
+	auto temp = snake_coord_.at(0);
 
 	// Update head position
 	head_position_ = RIGHT;
-	// Get actual y coord in order to define column number used for
-	//	horizontal movement
-	head = m_snakeCoord.back().second;
-		
-	// Update coordinates of symbols by decreasing x coord
-	for(;coord!=m_snakeCoord.end()&&symbol!=snake_symbol_.end();++coord,++symbol){
-		xCoord = coord->first;
-		yCoord = coord->second;
-		// Keep same y axis as before(head) and modify
-		//	the rest of body by shifting points to head coordinate
-		if(head!=yCoord){
-			// Check sense of movement of snake
-			if(head<yCoord){
-				yCoord--; 
-			}
-			else{
-				yCoord++;
-			}
+
+	// Update coordinates of symbols by changing head's coord and copying coordinates
+	//	of symbols from tail to head, follow head.
+	for(int i=snake_coord_.size()-1;i>=0;i--){
+		auto coord = snake_coord_.at(i);
+		// Change coordinate just for head, for the rest copy the previous coord
+		// 	of head, head-1
+		if(first){
+			first = false;
+			// Store previous value before changing coord
+			temp = snake_coord_.at(i);
+			// Decrease y coordinate to move to top of screen
+			coord.first++;
+			// Check for bottom of screen and move to top 
+			if(coord.first == width_){
+				coord.first = 0;
+			}	
 		}
 		else{
-			yCoord = head;				
-			xCoord++;	// Move point to chosen sense of movement
+			// Assign previous coordinates
+			coord = temp;
+			temp = snake_coord_.at(i);
 		}
-		// Check for edge of screen and move to oposite 
-		if(xCoord == width_){
-			xCoord = 0;
-		}
-		// Store coordinates to vector
-		coord->first = xCoord;
-		coord->second = yCoord;
-		// Move characters to next position(y,x)
-		moveChar(yCoord, xCoord, *symbol);  
+		// Store new coordinates
+		snake_coord_.at(i) = coord;
+		
+		moveChar(coord.second, coord.first, snake_symbol_.at(i)); 
+
+
 	}
 	refreshAndWait();
 }
