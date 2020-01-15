@@ -86,6 +86,10 @@ void Snake::refreshAndWait(){
 	clear();
 }
 
+void Snake::moveChar(int yCoord, int xCoord, wchar_t symbol){
+	mvaddch(yCoord, xCoord, symbol);
+}
+
 void Snake::goDown(){
 	auto coord = m_snakeCoord.begin();
 	auto symbol =  snake_symbol_.begin();
@@ -124,7 +128,7 @@ void Snake::goDown(){
 		coord->first = xCoord;
 		coord->second = yCoord;
 		// Move characters to next position(y,x)
-		mvaddch(yCoord, xCoord, *symbol); 
+		moveChar(yCoord, xCoord, *symbol); 
 	}
 	refreshAndWait();
 }
@@ -145,7 +149,7 @@ void Snake::goUp(){
 	for(;coord!=m_snakeCoord.end()&&symbol!=snake_symbol_.end();++coord,++symbol){
 		xCoord = coord->first;
 		yCoord = coord->second;
-		// Keep same x axis as before(head) going down and modify
+		// Keep X coordinate of head before going up and modify
 		//	the rest of body by shifting points to head coordinate
 		if(head!=xCoord){
 			// Check sense of movement of snake, 1st case move to left
@@ -168,7 +172,7 @@ void Snake::goUp(){
 		coord->first = xCoord;
 		coord->second = yCoord;
 		// Move characters to next position(y,x)
-		mvaddch(yCoord, xCoord, *symbol); 
+		moveChar(yCoord, xCoord, *symbol); 
 	}
 	refreshAndWait();
 }
@@ -212,7 +216,7 @@ void Snake::goLeft(){
 		coord->first = xCoord;
 		coord->second = yCoord;
 		// Move characters to next position(y,x)
-		mvaddch(yCoord, xCoord, *symbol); 
+		moveChar(yCoord, xCoord, *symbol);  
 	}
 	refreshAndWait();
 }
@@ -257,7 +261,7 @@ void Snake::goRight(){
 		coord->first = xCoord;
 		coord->second = yCoord;
 		// Move characters to next position(y,x)
-		mvaddch(yCoord, xCoord, *symbol); 
+		moveChar(yCoord, xCoord, *symbol);  
 	}
 	refreshAndWait();
 }

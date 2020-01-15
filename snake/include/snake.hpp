@@ -43,6 +43,8 @@ public:
 	void getScreenSize();
 	// Refresh screen and wait time 
 	void refreshAndWait();
+	// Update position of chars on screen 
+	void moveChar(int yCoord, int xCoord, wchar_t symbol); 
 	void goDown();
 	void goUp();
 	void goLeft();

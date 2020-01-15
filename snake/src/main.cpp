@@ -11,40 +11,68 @@ int main(){
 
 	int width = 0;
 	int height = 0;
-	wchar_t initial_direction = UP;
+	wchar_t actual_direction = RIGHT;
 	char key_start = ERR;
-	char oldInput = 0;
+	char old_direction = 0;
+	bool change_flag = false;
 
 		// Create snake object with wait time in mills and initial direction
-	Snake snake(400, initial_direction);
+	Snake snake(500, actual_direction);
 	
 	// Exit with STOP_KEY
-	while(initial_direction!=STOP_KEY){
-		// Check if nothing or wrong key was pressed, then keep previous command
-		if(initial_direction==ERR || (initial_direction!=UP && initial_direction!=DOWN && initial_direction!=RIGHT && initial_direction!=LEFT)){
-			initial_direction = oldInput;
+	while(actual_direction!=STOP_KEY){
+		// Check if no key or wrong key was pressed, then keep previous command
+		if(actual_direction==ERR || (actual_direction!=UP && actual_direction!=DOWN && 
+										actual_direction!=RIGHT && actual_direction!=LEFT)){
+			actual_direction = old_direction;
 		}
-		else{
-			oldInput = initial_direction;
-		}
-		switch(initial_direction){
+		
+		switch(actual_direction){
 			case UP: 
-				snake.goUp();
+				if(old_direction!=DOWN){
+					snake.goUp();
+					change_flag = true;
+				}
+				else{
+					change_flag = false;
+				}
 				break;
 			case DOWN:
-				snake.goDown();
+				if(old_direction!=UP){
+					snake.goDown();
+					change_flag = true;
+				}
+				else{
+					change_flag = false;
+				}
 				break;
 			case LEFT: 
-				snake.goLeft();
+				if(old_direction!=RIGHT){
+					snake.goLeft();
+					change_flag = true;
+				}
+				else{
+					change_flag = false;
+				}
 				break;
 			case RIGHT: 
-				snake.goRight();
+				if(old_direction!=LEFT){
+					snake.goRight();
+					change_flag = true;
+				}
+				else{
+					change_flag = false;
+				}
 				break;
 			default: // do nothing
 				break;
 		}
+		if(change_flag){
+			// Store direction that was selected 
+			old_direction = actual_direction;
+		}	
 		// Get direction from input
-		initial_direction = getch();
+		actual_direction = getch();
 	}
 
 	// Return to original screen
