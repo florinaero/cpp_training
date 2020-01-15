@@ -1,0 +1,12 @@
+[alias]
+	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+	st = status
+	last = log -1 HEAD
+	co = checkout
+	com = checkout master
+	alias = config --get-regexp alias
+	cif = show --pretty=\"\" --name-only origin/master
+	br = branch
+	ci = commit
+	bra = branch -a
+	logo = log --oneline
