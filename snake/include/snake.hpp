@@ -1,5 +1,6 @@
 #include <vector>
 #include <utility>
+#include <deque>
 using namespace std;
 
 // Define keys(inline constexpr available only for c++17) 
@@ -17,13 +18,15 @@ private:
 		Coord(int x_coord, int y_coord);
 	};
 	wchar_t head_position_;
+	int pace_;
 public:
 	int width_;
 	int height_;
 	int wait_time_mills_;
 	
 	// Coordinates of snake on screen
-	vector<pair<int,int> > snake_coord_;
+	// vector< pair<int,int> > snake_coord_;
+	deque<Coord> snake_coord_;
 	// Snake symbol
 	static const vector<char> snake_symbol_;
 	// Origin point 
@@ -43,7 +46,9 @@ public:
 	// Refresh screen and wait time 
 	void refreshAndWait();
 	// Update position of chars on screen 
-	void moveChar(int yCoord, int xCoord, char symbol); 
+	void moveChar(int yCoord, int xCoord, char symbol);
+	// Update coordinates according to the new direction 
+	void updateCoord(int new_xcoord, int new_ycoord);
 	void goDown();
 	void goUp();
 	void goLeft();
