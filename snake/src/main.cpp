@@ -16,8 +16,8 @@ int main(){
 	char old_direction = 0;
 	bool change_flag = false;
 
-		// Create snake object with wait time in mills and initial direction
-	Snake snake(300, actual_direction);
+	// Create snake object with wait time in mills and initial direction
+	Snake snake(100, actual_direction);
 	
 	// Exit with STOP_KEY
 	while(actual_direction!=STOP_KEY){
