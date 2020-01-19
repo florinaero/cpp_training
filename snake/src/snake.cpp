@@ -7,9 +7,9 @@
 #include <sys/ioctl.h>
 #include <stdio.h>
 #include "snake.hpp"
-
+#include <random>
 /*
-todo: Remove duplicated lines of changing direction func
+todo: Reduce size of run() function.
 todo: Remove fixed dimmension of snake_symbol_
 todo: Define window size from begining
 todo: Check why arrows are not working(keypad())
@@ -23,9 +23,8 @@ Solved: bug: Direction change one after another makes symbols to dissapear.
 using namespace std;
 
 // Snake symbol
-// const vector<char> Snake::snake_symbol_={'0', '1', '2', '3'};
 const vector<char> Snake::snake_symbol_={'*', '*', '*','*', '*', '*', 'o'};
-
+const wchar_t Snake::food_symbol_ = '$';
 // Coordinates constructor
 Snake::Coord::Coord(int x_coord, int y_coord):
 	x_coord(x_coord),
@@ -39,12 +38,15 @@ height_(0),
 wait_time_mills_(waitTimeMills)
 {
 	// Init screen for ncurses
-	Snake::intitScreen();
+	intitScreen();
 	// Define coordinates of snake on vertical
 	for(size_t i=0;i<snake_symbol_.size();i++){
 		// Start from middle of window
 		snake_coord_.push_back(Coord(width_/2, height_/2+i));
 	} 
+
+	// Start running snake
+	run();
 }
 
 void Snake::intitScreen(){
@@ -109,6 +111,78 @@ void Snake::updateCoord(int new_xcoord, int new_ycoord){
 	refreshAndWait();
 }
 
+//TODO: Reduce function size to 40 lines
+void Snake::run(){
+	char old_direction = 0;
+	bool change_flag = false;
+	Coord food_coord = getFoodCoord();
+	
+	// Exit with STOP_KEY
+	while(head_position_!=STOP_KEY){
+		// Check if no key or wrong key was pressed, then keep previous command
+		if(head_position_==ERR || (head_position_!=UP && head_position_!=DOWN && 
+										head_position_!=RIGHT && head_position_!=LEFT)){
+			head_position_ = old_direction;
+		}
+
+		// Generate new coordinates for food if head reached it
+		if(checkFoodReached(food_coord)){
+			food_coord = getFoodCoord();
+		}
+		// Place food symbol on screen 
+		moveChar(food_coord.y_coord, food_coord.x_coord, food_symbol_);
+	
+		switch(head_position_){
+			case UP: 
+				if(old_direction!=DOWN){
+					goUp();
+					change_flag = true;
+				}
+				else{
+					change_flag = false;
+				}
+				break;
+			case DOWN:
+				if(old_direction!=UP){
+					goDown();
+					change_flag = true;
+				}
+				else{
+					change_flag = false;
+				}
+				break;
+			case LEFT: 
+				if(old_direction!=RIGHT){
+					goLeft();
+					change_flag = true;
+				}
+				else{
+					change_flag = false;
+				}
+				break;
+			case RIGHT: 
+				if(old_direction!=LEFT){
+					goRight();
+					change_flag = true;
+				}
+				else{
+					change_flag = false;
+				}
+				break;
+			default: // do nothing
+				break;
+		}
+		if(change_flag){
+			// Store direction that was selected 
+			old_direction = head_position_;
+		}	
+		// Get direction from input
+		head_position_ = getch();
+	}
+	// Return to original screen
+	clearScreen();
+}
+
 void Snake::goDown(){
 	int new_ycoord = 0;
 	// Update head position
@@ -119,7 +193,6 @@ void Snake::goDown(){
 	if(new_ycoord==height_){
 		new_ycoord = 0;
 	}
-	
 	updateCoord(snake_coord_.back().x_coord, new_ycoord);
 }
 
@@ -164,4 +237,23 @@ void Snake::goRight(){
 	}
 	
 	updateCoord(new_xcoord, snake_coord_.back().y_coord);
+}
+
+Snake::Coord Snake::getFoodCoord(){
+	Coord food_coord(0,0);
+
+	random_device rd;  //Will be used to obtain a seed for the random number engine
+    mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+    uniform_int_distribution<> dis_x(1, width_ - 1);
+    uniform_int_distribution<> dis_y(1, height_ - 1);
+    
+    food_coord.x_coord = dis_x(gen);
+    food_coord.y_coord = dis_y(gen);
+    
+    return food_coord;
+}
+
+bool Snake::checkFoodReached(const Coord& food_coord){
+	// Compare coord of head with food coord
+	return (snake_coord_.back() == food_coord);
 }

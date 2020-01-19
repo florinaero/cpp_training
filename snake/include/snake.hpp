@@ -16,10 +16,12 @@ private:
 		int x_coord;
 		int y_coord;
 		Coord(int x_coord, int y_coord);
+		inline bool operator==(const Coord& other) const{
+			return ((x_coord==other.x_coord) && (y_coord==other.y_coord));
+		}
 	};
 	wchar_t head_position_;
 	int pace_;
-public:
 	int width_;
 	int height_;
 	int wait_time_mills_;
@@ -29,11 +31,7 @@ public:
 	deque<Coord> snake_coord_;
 	// Snake symbol
 	static const vector<char> snake_symbol_;
-	// Origin point 
-	static const int m_originPoint;
-
-	// Ctor
-	Snake(int waitTimeMills, wchar_t head_position);
+	static const wchar_t food_symbol_;
 
 	// Intialize screen using curses
 	void intitScreen();
@@ -49,8 +47,19 @@ public:
 	void moveChar(int yCoord, int xCoord, char symbol);
 	// Update coordinates according to the new direction 
 	void updateCoord(int new_xcoord, int new_ycoord);
+	// Control direction of snake, act as main function called 
+	//	during construction
+	void run();
 	void goDown();
 	void goUp();
 	void goLeft();
 	void goRight();
+	// Place food symbol on screen using random coorinates
+	Coord getFoodCoord();
+	// Check if head reached food 
+	bool checkFoodReached(const Coord& food_coord);
+
+public:
+	// Ctor
+	Snake(int waitTimeMills, wchar_t head_position);
 };
