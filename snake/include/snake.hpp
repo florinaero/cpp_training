@@ -37,7 +37,7 @@ private:
 	// vector< pair<int,int> > snake_coord_;
 	deque<Coord> snake_coord_;
 	static const wchar_t food_symbol_ = '&';
-	static const int born_size_ = 4;
+	static const int born_size_ = 10;
 
 	// Intialize screen using curses
 	void intitScreen();
@@ -64,8 +64,10 @@ private:
 	Coord getFoodCoord();
 	// Check if head reached food 
 	bool checkFoodReached(const Coord& food_coord);
-	// Increase size of snake by adding an element to deque 
+	// Increase size of snake by addsing an element to deque 
 	void increaseSize();
+	// Check if head hit body by looking for duplicate in list
+	bool checkCollision();
 
 public:
 	// Ctor

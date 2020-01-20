@@ -2,21 +2,40 @@
 #include <sstream>
 #include <iostream>
 #include <cmath>
+#include <deque>
 
 using namespace std;
 
-void funct(string& arg1, const string& arg2, string arg3, int arg4){}
+
 int main(){
 
 	long temp;
 	stringstream temp1;
 	string temp2;
 	int size; 
+	deque<int> dlist= {1,2,3,4,5,6,6};
+	
 
-	cout << 3/2 << endl;
-	cout << 1234/10 << endl;
-	cout << log(100) << endl;
-	cout << floor(log10(1002))+1 << endl;
+	cout << "post increment:" << endl;
+	for(auto it=dlist.begin();it!=dlist.end();it++){
+		cout << *it << endl;
+	}
 
+	cout << "pre increment:" << endl;
+	for(auto it=dlist.begin();it!=dlist.end();++it){
+		cout << *it << endl;
+	}
+
+
+	cout << "duplicates:" << endl;
+	for(int i=0;i<dlist.size()-1;++i){
+		int a = dlist.at(i);
+		int b = dlist.at(i+1);
+		// cout << a << " = " << b << endl;
+		if(a==b){
+			cout <<  a << " = " << b << endl;
+
+		}
+	}	
 	return 0;
 }

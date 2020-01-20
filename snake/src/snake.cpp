@@ -135,9 +135,15 @@ void Snake::run(){
 			food_coord = getFoodCoord();
 			increaseSize();
 		}
+		// DEBUG
+		// food_coord.y_coord = height_ -1;
 		// Place food symbol on screen 
 		moveChar(food_coord.y_coord, food_coord.x_coord, food_symbol_);
 		
+		// Check for collision 
+		if(checkCollision()){
+			break;
+		}
 		// Flag that checks if chosen direction is backwards
 		change_flag = false;
 		switch(head_position_){
@@ -186,7 +192,8 @@ void Snake::goDown(){
 
 	new_ycoord = snake_coord_.back().y_coord;
 	new_ycoord++;
-	if(new_ycoord==height_){
+	// Check not to get out of screen
+	if(new_ycoord>=height_){
 		new_ycoord = 0;
 	}
 	updateCoord(snake_coord_.back().x_coord, new_ycoord);
@@ -199,7 +206,7 @@ void Snake::goUp(){
 
 	new_ycoord = snake_coord_.back().y_coord;
 	new_ycoord--;
-	if(new_ycoord==0){
+	if(new_ycoord<1){
 		new_ycoord = height_ - 1;
 	}
 	
@@ -213,7 +220,7 @@ void Snake::goLeft(){
 
 	new_xcoord = snake_coord_.back().x_coord;
 	new_xcoord--;
-	if(new_xcoord==0){
+	if(new_xcoord<1){
 		new_xcoord = width_ - 1;
 	}
 	
@@ -228,7 +235,7 @@ void Snake::goRight(){
 
 	new_xcoord = snake_coord_.back().x_coord;
 	new_xcoord++;
-	if(new_xcoord==width_){
+	if(new_xcoord>=width_){
 		new_xcoord = 0;
 	}
 	
@@ -274,4 +281,29 @@ void Snake::increaseSize(){
 		default:	// Do nothing
 			break; 
 	}
+}
+
+// Check if head hits body by checking duplicate in list
+bool Snake::checkCollision(){
+	int wait_time = 400; 
+	auto head = snake_coord_.back();
+	// Check each element against last elem(head) 
+	for(size_t i=0;i<snake_coord_.size()-1;i++){
+		if(head==snake_coord_.at(i)){
+			for(int i=0;i<3;i++){
+				// Clear screen
+				clear();
+				refresh();
+				this_thread::sleep_for(chrono::milliseconds(wait_time));
+				for(auto & it : snake_coord_){
+					moveChar(it.y_coord, it.x_coord, SnakeSymbols::body);
+				}
+				// Refresh screen 
+				refresh();
+				this_thread::sleep_for(chrono::milliseconds(wait_time));
+			}
+			return true;
+		}
+	}
+	return false;
 }
