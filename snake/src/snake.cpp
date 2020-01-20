@@ -10,7 +10,7 @@
 #include <random>
 /*
 todo: Reduce size of run() function.
-todo: Remove fixed dimmension of snake_symbol_
+Solved: Remove fixed dimmension of snake_symbol_
 todo: Define window size from begining
 todo: Check why arrows are not working(keypad())
 Solved: todo: Implement smooth transition for direction change
@@ -22,9 +22,6 @@ Solved: bug: Direction change one after another makes symbols to dissapear.
 */
 using namespace std;
 
-// Snake symbol
-const vector<char> Snake::snake_symbol_={'*', '*', '*','*', '*', '*', 'o'};
-const wchar_t Snake::food_symbol_ = '$';
 // Coordinates constructor
 Snake::Coord::Coord(int x_coord, int y_coord):
 	x_coord(x_coord),
@@ -40,7 +37,7 @@ wait_time_mills_(waitTimeMills)
 	// Init screen for ncurses
 	intitScreen();
 	// Define coordinates of snake on vertical
-	for(size_t i=0;i<snake_symbol_.size();i++){
+	for(size_t i=0;i<born_size_;i++){
 		// Start from middle of window
 		snake_coord_.push_back(Coord(width_/2, height_/2+i));
 	} 
@@ -94,7 +91,7 @@ void Snake::moveChar(int yCoord, int xCoord, char symbol){
 
 void Snake::updateCoord(int new_xcoord, int new_ycoord){
 	// Create a copy of head at the end of deque
-	snake_coord_.emplace_back(snake_coord_.front());
+	snake_coord_.emplace_back(snake_coord_.back());
 	// Change y coordinate of the new head
 	snake_coord_.back().y_coord = new_ycoord;
 	// Change x coordinate of the new head
@@ -102,10 +99,18 @@ void Snake::updateCoord(int new_xcoord, int new_ycoord){
 	// Remove snake's tail
 	snake_coord_.pop_front();
 
+	wchar_t symbol = 'x';
 	// Update coordinates of symbols by changing head's coord and copying coordinates
 	//	of symbols from tail to head, follow head.
-	for(int i=snake_coord_.size()-1;i>=0;i--){
-		moveChar(snake_coord_.at(i).y_coord, snake_coord_.at(i).x_coord, snake_symbol_.at(i)); 
+	for(auto it=snake_coord_.rbegin();it!=snake_coord_.rend();++it){
+		// Choose symbols of snake according to deque coordinates sequence
+		if(it==snake_coord_.rbegin()){
+			symbol = SnakeSymbols::head;
+		}
+		else{
+			symbol = SnakeSymbols::body;
+		}
+		moveChar(it->y_coord, it->x_coord, symbol); 
 
 	}
 	refreshAndWait();
@@ -113,7 +118,7 @@ void Snake::updateCoord(int new_xcoord, int new_ycoord){
 
 //TODO: Reduce function size to 40 lines
 void Snake::run(){
-	char old_direction = 0;
+	wchar_t old_direction = 0;
 	bool change_flag = false;
 	Coord food_coord = getFoodCoord();
 	
@@ -128,18 +133,18 @@ void Snake::run(){
 		// Generate new coordinates for food if head reached it
 		if(checkFoodReached(food_coord)){
 			food_coord = getFoodCoord();
+			increaseSize();
 		}
 		// Place food symbol on screen 
 		moveChar(food_coord.y_coord, food_coord.x_coord, food_symbol_);
-	
+		
+		// Flag that checks if chosen direction is backwards
+		change_flag = false;
 		switch(head_position_){
 			case UP: 
 				if(old_direction!=DOWN){
 					goUp();
 					change_flag = true;
-				}
-				else{
-					change_flag = false;
 				}
 				break;
 			case DOWN:
@@ -147,17 +152,11 @@ void Snake::run(){
 					goDown();
 					change_flag = true;
 				}
-				else{
-					change_flag = false;
-				}
 				break;
 			case LEFT: 
 				if(old_direction!=RIGHT){
 					goLeft();
 					change_flag = true;
-				}
-				else{
-					change_flag = false;
 				}
 				break;
 			case RIGHT: 
@@ -165,11 +164,8 @@ void Snake::run(){
 					goRight();
 					change_flag = true;
 				}
-				else{
-					change_flag = false;
-				}
 				break;
-			default: // do nothing
+			default: // Do nothing
 				break;
 		}
 		if(change_flag){
@@ -256,4 +252,26 @@ Snake::Coord Snake::getFoodCoord(){
 bool Snake::checkFoodReached(const Coord& food_coord){
 	// Compare coord of head with food coord
 	return (snake_coord_.back() == food_coord);
+}
+
+void Snake::increaseSize(){
+	// Create a copy of head to increase size of snake
+	snake_coord_.emplace_back(snake_coord_.back());
+	// Define position of newest head by checking actual direction 
+	switch(head_position_){
+		case UP:
+			snake_coord_.back().y_coord--;
+			break;
+		case DOWN:
+			snake_coord_.back().y_coord++;
+			break;
+		case LEFT: 
+			snake_coord_.back().x_coord--;
+			break;
+		case RIGHT:
+			snake_coord_.back().x_coord++;
+			break;
+		default:	// Do nothing
+			break; 
+	}
 }

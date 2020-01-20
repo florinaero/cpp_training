@@ -10,6 +10,12 @@ inline constexpr wchar_t LEFT = 'a';
 inline constexpr wchar_t RIGHT = 'd';
 inline constexpr wchar_t STOP_KEY = 'q';
 
+// Symbols used for showing snake on screen 
+struct SnakeSymbols{
+	static const wchar_t head = 'o';
+	static const wchar_t body = '*'; 
+};
+
 class Snake{
 private:
 	struct Coord{
@@ -20,6 +26,7 @@ private:
 			return ((x_coord==other.x_coord) && (y_coord==other.y_coord));
 		}
 	};
+
 	wchar_t head_position_;
 	int pace_;
 	int width_;
@@ -29,9 +36,8 @@ private:
 	// Coordinates of snake on screen
 	// vector< pair<int,int> > snake_coord_;
 	deque<Coord> snake_coord_;
-	// Snake symbol
-	static const vector<char> snake_symbol_;
-	static const wchar_t food_symbol_;
+	static const wchar_t food_symbol_ = '&';
+	static const int born_size_ = 4;
 
 	// Intialize screen using curses
 	void intitScreen();
@@ -58,6 +64,8 @@ private:
 	Coord getFoodCoord();
 	// Check if head reached food 
 	bool checkFoodReached(const Coord& food_coord);
+	// Increase size of snake by adding an element to deque 
+	void increaseSize();
 
 public:
 	// Ctor

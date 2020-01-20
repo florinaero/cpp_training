@@ -9,6 +9,6 @@ using namespace std;
 int main(){
 
 	// Create snake object with wait time in mills and initial direction
-	Snake snake(50, RIGHT);
+	Snake snake(100, RIGHT);
 	return 0;
 }
