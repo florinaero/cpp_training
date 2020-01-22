@@ -32,12 +32,15 @@ private:
 	int width_;
 	int height_;
 	int wait_time_mills_;
+	shared_ptr<WINDOW> sptr_win_;
 	
 	// Coordinates of snake on screen
 	// vector< pair<int,int> > snake_coord_;
 	deque<Coord> snake_coord_;
-	static const wchar_t food_symbol_ = '&';
-	static const int born_size_ = 10;
+	static const wchar_t food_symbol_ = '$';
+	static const int born_size_ = 5;
+	static const int WindowWidth = 60;
+	static const int WindowHeight = 40;
 
 	// Intialize screen using curses
 	void intitScreen();
@@ -68,8 +71,17 @@ private:
 	void increaseSize();
 	// Check if head hit body by looking for duplicate in list
 	bool checkCollision();
+	// Create window in terminal 
+	void CreateWindow();
 
 public:
 	// Ctor
 	Snake(int waitTimeMills, wchar_t head_position);
+};
+
+// Reset terminal in case size of initial terminal is smaller than window size
+struct WrongSizeException : public exception{
+	const char * what () const throw (){
+		return "WrongSizeException";
+	}
 };

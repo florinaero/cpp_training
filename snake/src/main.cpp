@@ -7,8 +7,12 @@
 using namespace std;
 
 int main(){
-
-	// Create snake object with wait time in mills and initial direction
-	Snake snake(100, RIGHT);
+	try{
+		// Create snake object with wait time in mills and initial direction
+		Snake snake(100, LEFT);
+	}
+	catch(WrongSizeException& wre){
+		return 1;
+	}
 	return 0;
 }

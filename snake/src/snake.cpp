@@ -9,9 +9,11 @@
 #include "snake.hpp"
 #include <random>
 /*
+todo: Implement collision with edge.
+todo: Check new coordinate values if edge of window is reached.
 todo: Reduce size of run() function.
-Solved: Remove fixed dimmension of snake_symbol_
-todo: Define window size from begining
+Solved: todo: Remove fixed dimmension of snake_symbol_
+Solved: todo: Define window size from begining
 todo: Check why arrows are not working(keypad())
 Solved: todo: Implement smooth transition for direction change
 Solved: bug: Wrong transition at end of screen's right
@@ -19,6 +21,8 @@ Solved: bug: Wrong transition at end of screen's right
 Solved: bug: When sense is changed on same direction then the direction's
 		change is happening at the opposite head.
 Solved: bug: Direction change one after another makes symbols to dissapear. 
+bug: Snake dissapears on edge of window if direction is changed
+
 */
 using namespace std;
 
@@ -32,14 +36,15 @@ Snake::Snake(int waitTimeMills, wchar_t head_position):
 head_position_(head_position),
 width_(0),
 height_(0),
-wait_time_mills_(waitTimeMills)
+wait_time_mills_(waitTimeMills),
+sptr_win_(nullptr, [](WINDOW*) {})
 {
 	// Init screen for ncurses
 	intitScreen();
 	// Define coordinates of snake on vertical
 	for(size_t i=0;i<born_size_;i++){
 		// Start from middle of window
-		snake_coord_.push_back(Coord(width_/2, height_/2+i));
+		snake_coord_.push_back(Coord(WindowWidth/2, WindowHeight/2+i));
 	} 
 
 	// Start running snake
@@ -49,18 +54,21 @@ wait_time_mills_(waitTimeMills)
 void Snake::intitScreen(){
 	// Initialize screen 
 	initscr();
+	// Get size of terminal window
+	getScreenSize();
+	// Check size of terminal and create window
+	CreateWindow();
 	// Disables buffer and makes chars to immediately appear on screen 
 	cbreak();
 	// Disable printing input on screen 
 	noecho();
 	// getch() not waits for input, it returns ERR if key is not ready
-	nodelay(stdscr,true);
+	nodelay(sptr_win_.get(),true);
+	// notimeout(sptr_win_.get(),true);
 	// Enable special keys in order to use arrows; todo: is not working 
-	keypad(stdscr, true);
+	// keypad(stdscr, true);
 	// Hide cursor
 	curs_set(0);
-	// Get size of terminal window
-	getScreenSize();
 }
 
 void Snake::clearScreen(){
@@ -77,16 +85,17 @@ void Snake::getScreenSize(){
 }
 
 void Snake::refreshAndWait(){
+	box(sptr_win_.get(),'*','*');
 	// Refresh screen 
-	refresh();
-	// Wait time
+	wrefresh(sptr_win_.get());
+	// Wait time which gives snake's pace
 	this_thread::sleep_for(chrono::milliseconds(wait_time_mills_));
 	// Clear screen
-	clear();
+	wclear(sptr_win_.get());
 }
 
 void Snake::moveChar(int yCoord, int xCoord, char symbol){
-	mvaddch(yCoord, xCoord, symbol);
+	mvwaddch(sptr_win_.get(), yCoord, xCoord, symbol);
 }
 
 void Snake::updateCoord(int new_xcoord, int new_ycoord){
@@ -135,11 +144,10 @@ void Snake::run(){
 			food_coord = getFoodCoord();
 			increaseSize();
 		}
-		// DEBUG
-		// food_coord.y_coord = height_ -1;
 		// Place food symbol on screen 
 		moveChar(food_coord.y_coord, food_coord.x_coord, food_symbol_);
-		
+		wrefresh(sptr_win_.get());
+
 		// Check for collision 
 		if(checkCollision()){
 			break;
@@ -175,11 +183,11 @@ void Snake::run(){
 				break;
 		}
 		if(change_flag){
-			// Store direction that was selected 
+			// Store direction that was selected from keyboard
 			old_direction = head_position_;
 		}	
 		// Get direction from input
-		head_position_ = getch();
+		head_position_ = wgetch(sptr_win_.get());
 	}
 	// Return to original screen
 	clearScreen();
@@ -193,7 +201,7 @@ void Snake::goDown(){
 	new_ycoord = snake_coord_.back().y_coord;
 	new_ycoord++;
 	// Check not to get out of screen
-	if(new_ycoord>=height_){
+	if(new_ycoord>=WindowHeight){
 		new_ycoord = 0;
 	}
 	updateCoord(snake_coord_.back().x_coord, new_ycoord);
@@ -207,7 +215,7 @@ void Snake::goUp(){
 	new_ycoord = snake_coord_.back().y_coord;
 	new_ycoord--;
 	if(new_ycoord<1){
-		new_ycoord = height_ - 1;
+		new_ycoord = WindowHeight - 1;
 	}
 	
 	updateCoord(snake_coord_.back().x_coord, new_ycoord);
@@ -221,7 +229,7 @@ void Snake::goLeft(){
 	new_xcoord = snake_coord_.back().x_coord;
 	new_xcoord--;
 	if(new_xcoord<1){
-		new_xcoord = width_ - 1;
+		new_xcoord = WindowWidth - 1;
 	}
 	
 	updateCoord(new_xcoord, snake_coord_.back().y_coord);
@@ -235,7 +243,7 @@ void Snake::goRight(){
 
 	new_xcoord = snake_coord_.back().x_coord;
 	new_xcoord++;
-	if(new_xcoord>=width_){
+	if(new_xcoord>=WindowWidth){
 		new_xcoord = 0;
 	}
 	
@@ -247,8 +255,8 @@ Snake::Coord Snake::getFoodCoord(){
 
 	random_device rd;  //Will be used to obtain a seed for the random number engine
     mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
-    uniform_int_distribution<> dis_x(1, width_ - 1);
-    uniform_int_distribution<> dis_y(1, height_ - 1);
+    uniform_int_distribution<> dis_x(((width_ - WindowWidth)/2)+1, WindowWidth - 1);
+    uniform_int_distribution<> dis_y(((height_ - WindowHeight)/2)+1, WindowHeight - 1);
     
     food_coord.x_coord = dis_x(gen);
     food_coord.y_coord = dis_y(gen);
@@ -292,18 +300,40 @@ bool Snake::checkCollision(){
 		if(head==snake_coord_.at(i)){
 			for(int i=0;i<3;i++){
 				// Clear screen
-				clear();
-				refresh();
+				wclear(sptr_win_.get());
+				box(sptr_win_.get(),'*','*');
+				wrefresh(sptr_win_.get());
 				this_thread::sleep_for(chrono::milliseconds(wait_time));
 				for(auto & it : snake_coord_){
 					moveChar(it.y_coord, it.x_coord, SnakeSymbols::body);
 				}
 				// Refresh screen 
-				refresh();
+				wrefresh(sptr_win_.get());
 				this_thread::sleep_for(chrono::milliseconds(wait_time));
 			}
 			return true;
 		}
 	}
 	return false;
+}
+
+void Snake::CreateWindow(){
+	// Check if size of terminal is enough for window
+	if((width_<WindowWidth) || (height_<WindowHeight)){
+		endwin();
+		cout << "\n\nTerminal size must be larger than " << WindowWidth 
+			<< "x" << WindowHeight << "!"<< endl;
+		cout << "Actual size is " << width_ << "x" << height_ << ".\n\n" << endl;
+		throw WrongSizeException();
+	}
+
+	// Center window on actual screen 
+	int start_height = (height_ - WindowHeight)/2;
+	int start_width = (width_ - WindowWidth)/2;
+	// TODO: Understand why this assignment is necessary 
+	auto deleter = [](WINDOW*) {};
+	shared_ptr<WINDOW> sptr_win (newwin(WindowHeight, WindowWidth, start_height, start_width), deleter);
+	sptr_win_ = sptr_win;
+
+	box(sptr_win_.get(),'*','*');
 }
