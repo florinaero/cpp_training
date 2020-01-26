@@ -1,6 +1,10 @@
 #include <vector>
 #include <utility>
 #include <deque>
+#include <functional>
+#include <curses.h>
+#include <fstream>
+
 using namespace std;
 
 // Define keys(inline constexpr available only for c++17) 
@@ -14,6 +18,14 @@ inline constexpr wchar_t STOP_KEY = 'q';
 struct SnakeSymbols{
 	static const wchar_t head = 'o';
 	static const wchar_t body = '*'; 
+};
+
+// Store coordinate of ncurses window 
+struct WindowCoord{
+	int width_start;
+	int width_end;
+	int height_start;
+	int height_end;
 };
 
 class Snake{
@@ -32,15 +44,17 @@ private:
 	int width_;
 	int height_;
 	int wait_time_mills_;
-	shared_ptr<WINDOW> sptr_win_;
-	
+	int WindowWidth = 60;
+	int WindowHeight = 40;
+	// Deleter for window declare as function
+	function<void(WINDOW*)> del_win_;// = [](WINDOW* ptr_win) {delete ptr_win;};
+   	unique_ptr<WINDOW, decltype(del_win_)> uptr_win_;
+	WindowCoord win_coord_;
+	ofstream log_file_;
 	// Coordinates of snake on screen
-	// vector< pair<int,int> > snake_coord_;
 	deque<Coord> snake_coord_;
 	static const wchar_t food_symbol_ = '$';
 	static const int born_size_ = 5;
-	static const int WindowWidth = 60;
-	static const int WindowHeight = 40;
 
 	// Intialize screen using curses
 	void intitScreen();
