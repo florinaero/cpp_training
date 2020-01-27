@@ -6,3 +6,5 @@
 *.gch
 *.o.dSYM
 **/*.out.dSYM
+# Ignore log file for snake
+/snake/log_snake.txt
