@@ -35,15 +35,15 @@ Snake::Coord::Coord(int x_coord, int y_coord):
 	y_coord(y_coord)
 	{}
 
-Snake::Snake(int waitTimeMills, wchar_t head_position):
+Snake::Snake(int waitTimeMills, wchar_t head_position, bool edge_hit_enable):
 head_position_(head_position),
 width_(0),
 height_(0),
 wait_time_mills_(waitTimeMills),
-WindowWidth(60), 
-WindowHeight(40),
 uptr_win_(nullptr, [](WINDOW*) {}), 
-log_file_("log_snake.txt", ios_base::out)
+log_file_("log_snake.txt", ios_base::out),
+edge_hit_flag_(false),
+edge_hit_enable_(edge_hit_enable)
 {
 	// Init screen for ncurses
 	intitScreen();
@@ -93,6 +93,81 @@ void Snake::getScreenSize(){
 	// cout << "width: "<<width_ << "  height: \n" << height_;
 }
 
+//TODO: Reduce function size to 40 lines
+void Snake::run(){
+	wchar_t old_direction = 0;
+	bool change_flag = false;
+	Coord food_coord = getFoodCoord();
+	
+	log_file_ << "hello snake addicts!\n";
+
+	// Exit with STOP_KEY
+	while(head_position_!=STOP_KEY){
+		// Check if no key or wrong key was pressed, then keep previous command
+		if(head_position_==ERR || (head_position_!=UP && head_position_!=DOWN && 
+										head_position_!=RIGHT && head_position_!=LEFT)){
+			head_position_ = old_direction;
+		}
+
+		// Generate new coordinates for food if head reached it
+		if(checkFoodReached(food_coord)){
+			food_coord = getFoodCoord();
+			increaseSize();
+		}
+
+		// Place food symbol on screen 
+		moveChar(food_coord.y_coord, food_coord.x_coord, food_symbol_);
+		wrefresh(uptr_win_.get());
+
+		// Check for collision with body or edges
+		if(checkCollisionBody()){
+			break;
+		}
+		// Flag that checks if chosen direction is backwards
+		change_flag = false;
+		switch(head_position_){
+			case UP: 
+				if(old_direction!=DOWN){
+					goUp();
+					change_flag = true;
+				}
+				break;
+			case DOWN:
+				if(old_direction!=UP){
+					goDown();
+					change_flag = true;
+				}
+				break;
+			case LEFT: 
+				if(old_direction!=RIGHT){
+					goLeft();
+					change_flag = true;
+				}
+				break;
+			case RIGHT: 
+				if(old_direction!=LEFT){
+					goRight();
+					change_flag = true;
+				}
+				break;
+			default: // Do nothing
+				break;
+		}
+		if(edge_hit_flag_&&edge_hit_enable_){
+			FlashSnake(3);
+			break;
+		}
+		if(change_flag){
+			// Store direction that was selected from keyboard
+			old_direction = head_position_;
+		}	
+		// Get direction from input
+		head_position_ = wgetch(uptr_win_.get());
+	}
+	// Return to original screen
+	clearScreen();
+}
+
 void Snake::refreshAndWait(){
 	box(uptr_win_.get(),'*','*');
 	// Refresh screen 
@@ -134,77 +209,6 @@ void Snake::updateCoord(int new_xcoord, int new_ycoord){
 	refreshAndWait();
 }
 
-//TODO: Reduce function size to 40 lines
-void Snake::run(){
-	wchar_t old_direction = 0;
-	bool change_flag = false;
-	Coord food_coord = getFoodCoord();
-	
-	log_file_ << "hello snake addicts!\n";
-
-	// Exit with STOP_KEY
-	while(head_position_!=STOP_KEY){
-		// Check if no key or wrong key was pressed, then keep previous command
-		if(head_position_==ERR || (head_position_!=UP && head_position_!=DOWN && 
-										head_position_!=RIGHT && head_position_!=LEFT)){
-			head_position_ = old_direction;
-		}
-
-		// Generate new coordinates for food if head reached it
-		if(checkFoodReached(food_coord)){
-			food_coord = getFoodCoord();
-			increaseSize();
-		}
-
-		// Place food symbol on screen 
-		moveChar(food_coord.y_coord, food_coord.x_coord, food_symbol_);
-		wrefresh(uptr_win_.get());
-
-		// Check for collision 
-		if(checkCollision()){
-			break;
-		}
-		// Flag that checks if chosen direction is backwards
-		change_flag = false;
-		switch(head_position_){
-			case UP: 
-				if(old_direction!=DOWN){
-					goUp();
-					change_flag = true;
-				}
-				break;
-			case DOWN:
-				if(old_direction!=UP){
-					goDown();
-					change_flag = true;
-				}
-				break;
-			case LEFT: 
-				if(old_direction!=RIGHT){
-					goLeft();
-					change_flag = true;
-				}
-				break;
-			case RIGHT: 
-				if(old_direction!=LEFT){
-					goRight();
-					change_flag = true;
-				}
-				break;
-			default: // Do nothing
-				break;
-		}
-		if(change_flag){
-			// Store direction that was selected from keyboard
-			old_direction = head_position_;
-		}	
-		// Get direction from input
-		head_position_ = wgetch(uptr_win_.get());
-	}
-	// Return to original screen
-	clearScreen();
-}
-
 void Snake::goDown(){
 	int new_ycoord = 0;
 	// Update head position
@@ -216,9 +220,13 @@ void Snake::goDown(){
 	// Check not to get out of screen
 	if(new_ycoord>=WindowHeight-1){
 		new_ycoord = 1;
+		edge_hit_flag_ = true;
 		log_file_ << "Condition Down: new_ycoord = " << new_ycoord << endl; 
 	}
-	updateCoord(snake_coord_.back().x_coord, new_ycoord);
+	// Check if collision is active and snake hit the edge
+	if(!(edge_hit_flag_ && edge_hit_enable_)){
+		updateCoord(snake_coord_.back().x_coord, new_ycoord);
+	}
 }
 
 void Snake::goUp(){
@@ -232,10 +240,12 @@ void Snake::goUp(){
 	if(new_ycoord<1){
 		// Subtract 2 cols due to box dimenssion
 		new_ycoord = WindowHeight - 2;
+		edge_hit_flag_ = true;
 		log_file_ << "Condition Up: new_ycoord = " << new_ycoord << endl; 
 	}
-	
-	updateCoord(snake_coord_.back().x_coord, new_ycoord);
+	if(!(edge_hit_flag_ && edge_hit_enable_)){
+		updateCoord(snake_coord_.back().x_coord, new_ycoord);
+	}
 }
 
 void Snake::goLeft(){
@@ -249,10 +259,12 @@ void Snake::goLeft(){
 	if(new_xcoord<1){		
 		// Subtract 2 cols due to box dimenssion
 		new_xcoord = WindowWidth - 2;
+		edge_hit_flag_ = true;
 		log_file_ << "Condition Left: new_xcoord = " << new_xcoord << endl; 
 	}
-	
-	updateCoord(new_xcoord, snake_coord_.back().y_coord);
+	if(!(edge_hit_flag_ && edge_hit_enable_)){
+		updateCoord(new_xcoord, snake_coord_.back().y_coord);
+	}
 }
 
 void Snake::goRight(){
@@ -266,10 +278,12 @@ void Snake::goRight(){
 	log_file_ << "Right: new_xcoord = " << new_xcoord << endl; 
 	if(new_xcoord>=WindowWidth-1){
 		new_xcoord = 1;
+		edge_hit_flag_ = true;
 		log_file_ << "Condition Right: new_xcoord = " << new_xcoord << endl; 
 	}
-	
-	updateCoord(new_xcoord, snake_coord_.back().y_coord);
+	if(!(edge_hit_flag_ && edge_hit_enable_)){
+		updateCoord(new_xcoord, snake_coord_.back().y_coord);
+	}
 }
 
 Snake::Coord Snake::getFoodCoord(){
@@ -314,29 +328,48 @@ void Snake::increaseSize(){
 }
 
 // Check if head hits body by checking duplicate in list
-bool Snake::checkCollision(){
-	int wait_time = 400; 
+bool Snake::checkCollisionBody(){
 	auto head = snake_coord_.back();
 	// Check each element against last elem(head) 
 	for(size_t i=0;i<snake_coord_.size()-1;i++){
 		if(head==snake_coord_.at(i)){
-			for(int i=0;i<3;i++){
-				// Clear screen
-				wclear(uptr_win_.get());
-				box(uptr_win_.get(),'*','*');
-				wrefresh(uptr_win_.get());
-				this_thread::sleep_for(chrono::milliseconds(wait_time));
-				for(auto & it : snake_coord_){
-					moveChar(it.y_coord, it.x_coord, SnakeSymbols::body);
-				}
-				// Refresh screen 
-				wrefresh(uptr_win_.get());
-				this_thread::sleep_for(chrono::milliseconds(wait_time));
-			}
-			return true;
+			FlashSnake(3);
+			return true;	
 		}
 	}
 	return false;
+}
+
+// Check if head hits edges
+bool Snake::checkCollisionEdge(){
+	auto head = snake_coord_.back();
+	log_file_ << "w_w = " << WindowWidth << " w_h = " << WindowHeight << endl;
+	log_file_ << "head.x = " << head.x_coord << "  head.y = " << head.y_coord << endl;
+	if(head.x_coord==1 || head.x_coord==WindowWidth-2 ||
+		head.y_coord==1 || head.y_coord==WindowHeight-2){
+		FlashSnake(3);
+		return true;
+	}
+return false;
+}
+
+// Flash image of snake on screen, used for collisions
+void Snake::FlashSnake(int no_flashes){
+	// Wait time in milliseconds
+	const int wait_time = 300; 
+	for(int i=0;i<no_flashes;i++){
+		// Clear screen
+		wclear(uptr_win_.get());
+		box(uptr_win_.get(),'*','*');
+		wrefresh(uptr_win_.get());
+		this_thread::sleep_for(chrono::milliseconds(wait_time));
+		for(auto & it : snake_coord_){
+			moveChar(it.y_coord, it.x_coord, SnakeSymbols::body);
+		}
+		// Refresh screen 
+		wrefresh(uptr_win_.get());
+		this_thread::sleep_for(chrono::milliseconds(wait_time));
+	}
 }
 
 void Snake::CreateWindow(){
@@ -354,7 +387,15 @@ void Snake::CreateWindow(){
 	win_coord_.width_end = win_coord_.width_start + WindowWidth;
 	win_coord_.height_start = (height_ - WindowHeight)/2;
 	win_coord_.height_end = win_coord_.height_start + WindowHeight;
-	
+
+	// log_file_ << "width_ = " << width_ << endl;
+	// log_file_ << "height_ = " << height_ << endl;
+	// log_file_ << "win_coord_.width_start = " << win_coord_.width_start << endl;
+	// log_file_ << "win_coord_.width_end = " << win_coord_.width_end << endl;
+	// log_file_ << "win_coord_.height_start = " << win_coord_.height_start << endl;
+	// log_file_ << "win_coord_.height_end = " << win_coord_.height_end << endl;
+	// log_file_ << "w_w = " << WindowWidth << "w_h = " << WindowHeight << endl;
+
 	// Pointer to WIDNOW struct with game's window coordinates
 	uptr_win_.reset(newwin(WindowHeight, WindowWidth, win_coord_.height_start, win_coord_.width_start));
 

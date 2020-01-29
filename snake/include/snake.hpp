@@ -53,6 +53,10 @@ private:
 	ofstream log_file_;
 	// Coordinates of snake on screen
 	deque<Coord> snake_coord_;
+	// Flag used to detect collision with edges
+	bool edge_hit_flag_;
+	// Flag that enables collision with edges
+	bool edge_hit_enable_;
 	static const wchar_t food_symbol_ = '$';
 	static const int born_size_ = 5;
 
@@ -83,14 +87,18 @@ private:
 	bool checkFoodReached(const Coord& food_coord);
 	// Increase size of snake by addsing an element to deque 
 	void increaseSize();
-	// Check if head hit body by looking for duplicate in list
-	bool checkCollision();
+	// Check if head hits body by looking for duplicate in list
+	bool checkCollisionBody();
+	// Check if head hits edges
+	bool checkCollisionEdge();
 	// Create window in terminal 
 	void CreateWindow();
+	// Flash image of snake on screen, used for collisions
+	void FlashSnake(int no_flashes);
 
 public:
 	// Ctor
-	Snake(int waitTimeMills, wchar_t head_position);
+	Snake(int waitTimeMills, wchar_t head_position, bool edge_hit_enable);
 };
 
 // Reset terminal in case size of initial terminal is smaller than window size
