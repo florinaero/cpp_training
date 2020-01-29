@@ -216,12 +216,10 @@ void Snake::goDown(){
 
 	new_ycoord = snake_coord_.back().y_coord;
 	new_ycoord++;
-	log_file_ << "Down: new_ycoord = " << new_ycoord << endl; 
 	// Check not to get out of screen
 	if(new_ycoord>=WindowHeight-1){
 		new_ycoord = 1;
 		edge_hit_flag_ = true;
-		log_file_ << "Condition Down: new_ycoord = " << new_ycoord << endl; 
 	}
 	// Check if collision is active and snake hit the edge
 	if(!(edge_hit_flag_ && edge_hit_enable_)){
@@ -236,12 +234,10 @@ void Snake::goUp(){
 
 	new_ycoord = snake_coord_.back().y_coord;
 	new_ycoord--;
-	log_file_ << "Up: new_ycoord = " << new_ycoord << endl; 
 	if(new_ycoord<1){
 		// Subtract 2 cols due to box dimenssion
 		new_ycoord = WindowHeight - 2;
 		edge_hit_flag_ = true;
-		log_file_ << "Condition Up: new_ycoord = " << new_ycoord << endl; 
 	}
 	if(!(edge_hit_flag_ && edge_hit_enable_)){
 		updateCoord(snake_coord_.back().x_coord, new_ycoord);
@@ -255,12 +251,10 @@ void Snake::goLeft(){
 
 	new_xcoord = snake_coord_.back().x_coord;
 	new_xcoord--;
-	log_file_ << "Left: new_xcoord = " << new_xcoord << endl; 
 	if(new_xcoord<1){		
 		// Subtract 2 cols due to box dimenssion
 		new_xcoord = WindowWidth - 2;
 		edge_hit_flag_ = true;
-		log_file_ << "Condition Left: new_xcoord = " << new_xcoord << endl; 
 	}
 	if(!(edge_hit_flag_ && edge_hit_enable_)){
 		updateCoord(new_xcoord, snake_coord_.back().y_coord);
@@ -268,18 +262,15 @@ void Snake::goLeft(){
 }
 
 void Snake::goRight(){
-
 	int new_xcoord = 0;
 	// Update head position
 	head_position_ = RIGHT;
 
 	new_xcoord = snake_coord_.back().x_coord;
 	new_xcoord++;
-	log_file_ << "Right: new_xcoord = " << new_xcoord << endl; 
 	if(new_xcoord>=WindowWidth-1){
 		new_xcoord = 1;
 		edge_hit_flag_ = true;
-		log_file_ << "Condition Right: new_xcoord = " << new_xcoord << endl; 
 	}
 	if(!(edge_hit_flag_ && edge_hit_enable_)){
 		updateCoord(new_xcoord, snake_coord_.back().y_coord);
@@ -291,12 +282,16 @@ Snake::Coord Snake::getFoodCoord(){
 
 	random_device rd;  //Will be used to obtain a seed for the random number engine
     mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
-    // Avoid placing food symbol on window edges by adding and subtracting 1
-    uniform_int_distribution<> dis_x(1, WindowWidth-1);
-    uniform_int_distribution<> dis_y(1, WindowHeight-1);
+    // Avoid placing food symbol on window edges by adding and 
+    //	subtracting 2 beacause there are 2 edges of box
+    uniform_int_distribution<> dis_x(1, WindowWidth-2);
+    uniform_int_distribution<> dis_y(1, WindowHeight-2);
     
     food_coord.x_coord = dis_x(gen);
     food_coord.y_coord = dis_y(gen);
+    log_file_ << "food_coord.x_coord = " << food_coord.x_coord << endl;
+    log_file_ << "food_coord.y_coord = " << food_coord.y_coord << endl;
+    log_file_ << "food coord end" << endl;
     return food_coord;
 }
 
@@ -387,14 +382,14 @@ void Snake::CreateWindow(){
 	win_coord_.width_end = win_coord_.width_start + WindowWidth;
 	win_coord_.height_start = (height_ - WindowHeight)/2;
 	win_coord_.height_end = win_coord_.height_start + WindowHeight;
-
-	// log_file_ << "width_ = " << width_ << endl;
-	// log_file_ << "height_ = " << height_ << endl;
-	// log_file_ << "win_coord_.width_start = " << win_coord_.width_start << endl;
-	// log_file_ << "win_coord_.width_end = " << win_coord_.width_end << endl;
-	// log_file_ << "win_coord_.height_start = " << win_coord_.height_start << endl;
-	// log_file_ << "win_coord_.height_end = " << win_coord_.height_end << endl;
-	// log_file_ << "w_w = " << WindowWidth << "w_h = " << WindowHeight << endl;
+	
+	log_file_ << "width_ = " << width_ << endl;
+	log_file_ << "height_ = " << height_ << endl;
+	log_file_ << "win_coord_.width_start = " << win_coord_.width_start << endl;
+	log_file_ << "win_coord_.width_end = " << win_coord_.width_end << endl;
+	log_file_ << "win_coord_.height_start = " << win_coord_.height_start << endl;
+	log_file_ << "win_coord_.height_end = " << win_coord_.height_end << endl;
+	log_file_ << "w_w = " << WindowWidth << "w_h = " << WindowHeight << endl;
 
 	// Pointer to WIDNOW struct with game's window coordinates
 	uptr_win_.reset(newwin(WindowHeight, WindowWidth, win_coord_.height_start, win_coord_.width_start));

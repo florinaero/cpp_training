@@ -45,7 +45,7 @@ private:
 	int height_;
 	int wait_time_mills_;
 	int WindowWidth = 60;
-	int WindowHeight = 40;
+	int WindowHeight = 30;
 	// Deleter for window declare as function
 	function<void(WINDOW*)> del_win_;// = [](WINDOW* ptr_win) {delete ptr_win;};
    	unique_ptr<WINDOW, decltype(del_win_)> uptr_win_;
