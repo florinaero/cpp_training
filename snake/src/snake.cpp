@@ -98,9 +98,7 @@ void Snake::run(){
 	wchar_t old_direction = 0;
 	bool change_flag = false;
 	Coord food_coord = getFoodCoord();
-	
-	log_file_ << "hello snake addicts!\n";
-
+	int score = 0;
 	// Exit with STOP_KEY
 	while(head_position_!=STOP_KEY){
 		// Check if no key or wrong key was pressed, then keep previous command
@@ -112,9 +110,11 @@ void Snake::run(){
 		// Generate new coordinates for food if head reached it
 		if(checkFoodReached(food_coord)){
 			food_coord = getFoodCoord();
-			increaseSize();
+			increaseSize(); // Increase snake's size
+			score++;	//Increase score
 		}
 
+		ShowScore(score);
 		// Place food symbol on screen 
 		moveChar(food_coord.y_coord, food_coord.x_coord, food_symbol_);
 		wrefresh(uptr_win_.get());
@@ -380,9 +380,11 @@ void Snake::CreateWindow(){
 	// Initialize coord. in order to center window in respect to terminal size
 	win_coord_.width_start = (width_ - WindowWidth)/2;
 	win_coord_.width_end = win_coord_.width_start + WindowWidth;
-	win_coord_.height_start = (height_ - WindowHeight)/2;
+	// Add offset to leave space for upper text
+	win_coord_.height_start = (height_ - WindowHeight)/2+1;
 	win_coord_.height_end = win_coord_.height_start + WindowHeight;
 	
+	log_file_ <<"hello snake addicts!\n";
 	log_file_ << "width_ = " << width_ << endl;
 	log_file_ << "height_ = " << height_ << endl;
 	log_file_ << "win_coord_.width_start = " << win_coord_.width_start << endl;
@@ -395,4 +397,12 @@ void Snake::CreateWindow(){
 	uptr_win_.reset(newwin(WindowHeight, WindowWidth, win_coord_.height_start, win_coord_.width_start));
 
 	box(uptr_win_.get(),'*','*');
+}
+
+// Compute score and display it on screen(stdscr)
+bool Snake::ShowScore(int score){
+	string score_text = "score: " + to_string(score);
+	const char* ptr_score = score_text.c_str();
+	mvaddstr(0,0,ptr_score);
+	refresh();
 }

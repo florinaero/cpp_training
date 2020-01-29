@@ -95,6 +95,8 @@ private:
 	void CreateWindow();
 	// Flash image of snake on screen, used for collisions
 	void FlashSnake(int no_flashes);
+	// Calculate score and show it on stdscr
+	bool ShowScore(int score);
 
 public:
 	// Ctor
