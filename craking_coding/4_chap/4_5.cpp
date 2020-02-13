@@ -49,8 +49,10 @@ public:
 	void showInOrder(shared_ptr<Node> root);
 	void showPreOrder(shared_ptr<Node> root);
 	void showPostOrder(shared_ptr<Node> root);
+	bool checkBstPreOrder(const shared_ptr<Node> root);
 };
 
+// Insert nodes to tree in respect to bst rule
 shared_ptr<Node> Tree::insert(Node node, shared_ptr<Node> &root){
 	if(root == nullptr){
 		root = make_shared<Node>(node);
@@ -73,6 +75,13 @@ shared_ptr<Node> Tree::insert(Node node, shared_ptr<Node> &root){
 }
 
 void Tree::showInOrder(shared_ptr<Node> root){
+	static bool flag = true;
+	
+	if(flag){
+		flag = false;	
+		cout << "In order" << endl;
+	}
+
 	if(root!=nullptr){
 		showInOrder(root->left_);
 		cout << root->key_ << endl;
@@ -81,6 +90,13 @@ void Tree::showInOrder(shared_ptr<Node> root){
 }
 
 void Tree::showPreOrder(shared_ptr<Node> root){
+	static bool flag = true;
+	
+	if(flag){
+		flag = false;	
+		cout << "Pre order" << endl;
+	}
+
 	if(root!=nullptr){
 		cout << root->key_ << endl;
 		showPreOrder(root->left_);
@@ -89,11 +105,49 @@ void Tree::showPreOrder(shared_ptr<Node> root){
 }
 
 void Tree::showPostOrder(shared_ptr<Node> root){
+	static bool flag = true;
+	
+	if(flag){
+		flag = false;	
+		cout << "Post order" << endl;
+	}
+
 	if(root!=nullptr){
 		showPostOrder(root->left_);
 		showPostOrder(root->right_);
 		cout << root->key_ << endl;
 	}
+}
+
+// Check for BST in preorder traversal
+bool Tree::checkBstPreOrder(const shared_ptr<Node> root){
+	bool result = true;
+	if(root!=nullptr){
+		// Check if root is not greater than left child
+		if(root->left_!=nullptr){
+			Logging::print("root->left_->key_ = " +
+					to_string(root->left_->key_), LOG);
+			if(!(root->key_ > root->left_->key_)){
+				Logging::print("$$$$$$wrong left");
+				return false;
+			}
+		}
+		
+		// Check if root is not greater or equal than right child
+		if(root->right_!=nullptr){
+			Logging::print("root->right_->key_ = " +
+					to_string(root->right_->key_), LOG);
+			if(!(root->key_ <= root->right_->key_)){
+				Logging::print("######wrong right");
+				return false;
+			}
+		}
+
+		result = checkBstPreOrder(root->left_);
+		result = checkBstPreOrder(root->right_);
+		return result&&result;
+	}
+	return true;
 }
 
 int main(){
@@ -118,6 +172,8 @@ int main(){
 	junior_tree.showPreOrder(junior_tree.root_);
 	Logging::print("PostOrder", LOG);
 	junior_tree.showPostOrder(junior_tree.root_);
-	
+	bool isBst = junior_tree.checkBstPreOrder(junior_tree.root_);
+	Logging::print("Is BST? -> "+to_string(isBst));
+
 	return 0;
 }
