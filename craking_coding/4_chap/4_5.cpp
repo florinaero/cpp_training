@@ -45,15 +45,15 @@ public:
 	root_(nullptr)
 	{}
 
-	shared_ptr<Node> insert(Node node, shared_ptr<Node> &root);
+	shared_ptr<Node> insertBst(Node node, shared_ptr<Node> &root);
 	void showInOrder(shared_ptr<Node> root);
 	void showPreOrder(shared_ptr<Node> root);
 	void showPostOrder(shared_ptr<Node> root);
 	bool checkBstPreOrder(const shared_ptr<Node> root);
 };
 
-// Insert nodes to tree in respect to bst rule
-shared_ptr<Node> Tree::insert(Node node, shared_ptr<Node> &root){
+// insertBst nodes to tree in respect to bst rule
+shared_ptr<Node> Tree::insertBst(Node node, shared_ptr<Node> &root){
 	if(root == nullptr){
 		root = make_shared<Node>(node);
 		return root;
@@ -64,12 +64,12 @@ shared_ptr<Node> Tree::insert(Node node, shared_ptr<Node> &root){
 	if(node.key_<root->key_){
 		Logging::print("left "+to_string(node.key_)+" "+
 			to_string(root->key_), LOG);
-		root->left_ = insert(node, root->left_);
+		root->left_ = insertBst(node, root->left_);
 	}
 	if(node.key_>=root->key_){
 		Logging::print("right "+to_string(node.key_)+" "+
 			to_string(root->key_), LOG);
-		root->right_ = insert(node, root->right_);
+		root->right_ = insertBst(node, root->right_);
 	}
 	return root;
 }
@@ -164,7 +164,7 @@ int main(){
 	for(it;it!=output.at(0).end();++it){
 		Node new_node(*it);
 		Logging::print("node key = "+to_string(new_node.key_),LOG);
-		junior_tree.insert(new_node, junior_tree.root_);
+		junior_tree.insertBst(new_node, junior_tree.root_);
 	}
 	Logging::print("InOrder", LOG);
 	junior_tree.showInOrder(junior_tree.root_);
