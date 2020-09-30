@@ -8,3 +8,6 @@
 **/*.out.dSYM
 # Ignore log file for snake
 /snake/log_snake.txt
+# Ignore log files for courses
+**/*.log
+__pycache__

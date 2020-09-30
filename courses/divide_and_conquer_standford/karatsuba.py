@@ -115,8 +115,10 @@ def main():
 	# b = "11"
 	result = karatsuba(a,b)
 	log.writeLog("*****************", True)
+	# Result of Karatsuba algorithm
 	log.writeLog(a + " x " + b + " = " + str(result), True)
 	print(a + " x " + b + " = " + str(result))
+	# Result of normal multiplication
 	stolen_result = int(a) * int(b)
 	print("Correct result = " + str(stolen_result))
 	if(stolen_result==result):
@@ -126,6 +128,8 @@ def main():
 	log.writeLog("*****************", True)
 
 if __name__ == "__main__":
-	log = logging_user.Logging("karatsuba.txt", False)
+	# 2nd parameter: True->All logs; False->Only the one with True for writeLog()
+	log = logging_user.Logging("karatsuba", True)
+	# Disable all logs to file
 	log.logOff()
 	main()

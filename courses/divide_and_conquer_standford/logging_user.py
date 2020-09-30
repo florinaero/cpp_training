@@ -2,7 +2,7 @@ import time
 # This class handles logging in text file
 class Logging:
 	def __init__(self, log_path, log_status):
-		self.log_path = log_path
+		self.log_path = log_path + ".log"
 		self.log_status = log_status
 		self.log_off = True
 		self.__configureLogFile()
