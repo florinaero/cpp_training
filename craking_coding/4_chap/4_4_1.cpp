@@ -103,7 +103,7 @@ int main() {
 	inOrder(root);
 	cout << "Height: " << getHeight(root) << endl;
 
-	bool isBalanced = isBalanced(root);
-	cout << "Is balanced: " << boolalpha << isBalanced << endl;
+	bool balanced = isBalanced(root);
+	cout << "Is balanced: " << boolalpha << balanced << endl;
 	return 0;
 }
